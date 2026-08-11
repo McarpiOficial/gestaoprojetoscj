@@ -40,6 +40,40 @@ function applyStoredSidebarCollapsePreference() {
 
 window.addEventListener('DOMContentLoaded', applyStoredSidebarCollapsePreference);
 
+// Recolher/expandir a área de busca/CSV/Imprimir/Atualizar no mobile (o botão só aparece
+// visualmente abaixo de 767px, ver responsive.css) — no celular essa área sozinha ocupava
+// boa parte da tela, sobrando pouco espaço pros projetos. Preferência salva no navegador.
+const HEADER_ACTIONS_COLLAPSE_KEY = 'cijun-header-actions-collapsed';
+
+function toggleHeaderActions() {
+    const actions = document.getElementById('header-actions');
+    const btn = document.getElementById('header-actions-toggle');
+    if (!actions) return;
+    const isCollapsed = actions.classList.toggle('collapsed');
+    localStorage.setItem(HEADER_ACTIONS_COLLAPSE_KEY, isCollapsed ? '1' : '0');
+
+    if (btn) {
+        btn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+        btn.setAttribute('aria-label', isCollapsed ? 'Expandir busca e ações' : 'Recolher busca e ações');
+        btn.title = btn.getAttribute('aria-label');
+    }
+}
+
+function applyStoredHeaderActionsPreference() {
+    if (localStorage.getItem(HEADER_ACTIONS_COLLAPSE_KEY) === '1') {
+        const actions = document.getElementById('header-actions');
+        const btn = document.getElementById('header-actions-toggle');
+        if (actions) actions.classList.add('collapsed');
+        if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', 'Expandir busca e ações');
+            btn.title = btn.getAttribute('aria-label');
+        }
+    }
+}
+
+window.addEventListener('DOMContentLoaded', applyStoredHeaderActionsPreference);
+
 function switchView(viewName, element) {
     document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
     element.classList.add('active');

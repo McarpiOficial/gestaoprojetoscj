@@ -51,8 +51,11 @@
 					<h1 id="view-title">Projetos Ativos DT</h1>
 					<p>Mecanismo Isolado Estável • Sincronização Dinâmica Local • Último Update: <span id="update-timestamp">Sincronizando...</span></p>
 				</div>
+				<button id="header-actions-toggle" class="header-actions-toggle" onclick="toggleHeaderActions()" aria-label="Recolher busca e ações" aria-expanded="true" title="Recolher busca e ações">
+					<i class="ph-bold ph-caret-up"></i>
+				</button>
 			</div>
-			<div style="display: flex; gap: 12px; align-items: center;">
+			<div id="header-actions" class="header-actions" style="display: flex; gap: 12px; align-items: center;">
 				<input type="text" id="input-busca" placeholder="Buscar projeto ou ticket..." style="padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; width: 280px; outline: none;" oninput="resetSearch()" aria-describedby="search-feedback">
 				<span id="search-feedback" role="status" style="font-size: 13px; font-weight: 600; color: var(--color-danger); white-space: nowrap;"></span>
                 <div style="position: relative; display: flex; width: 100%;">

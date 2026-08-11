@@ -104,9 +104,24 @@
 
     .top-header { flex-direction: column; align-items: flex-start; padding: var(--space-4); gap: var(--space-4); height: auto; }
     .header-title-row { width: 100%; }
-    .top-header > div:last-child { flex-direction: column; width: 100%; align-items: stretch; }
     #input-busca { width: 100% !important; }
     .top-header .btn { width: 100%; text-align: center; min-height: 44px; }
+
+    /* Área de busca/CSV/Imprimir/Atualizar recolhível — no celular ela sozinha já ocupa boa
+       parte da tela, sobrando pouco espaço pros projetos. O botão (seta) fica no cabeçalho,
+       ver .header-actions-toggle em base.css; o estado escolhido persiste via localStorage
+       (applyStoredHeaderActionsPreference em ui-navigation.js). */
+    .header-actions-toggle { display: inline-flex; align-items: center; justify-content: center; }
+    .header-actions {
+        flex-direction: column;
+        width: 100%;
+        align-items: stretch;
+        overflow: hidden;
+        max-height: 400px;
+        opacity: 1;
+        transition: max-height var(--transition-base), opacity var(--transition-base);
+    }
+    .header-actions.collapsed { max-height: 0; opacity: 0; }
 
     .table-toolbar { flex-direction: column; align-items: stretch; gap: var(--space-3); }
     .table-toolbar > div { justify-content: space-between; width: 100%; }

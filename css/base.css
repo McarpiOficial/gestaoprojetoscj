@@ -202,6 +202,25 @@ body {
 
 .hamburger-btn:hover { background-color: var(--gray-100); }
 
+/* Botão de recolher a área de busca/ações do cabeçalho — só existe (visualmente) no mobile,
+   ver responsive.css. No desktop/tablet fica sempre expandida, não precisa de toggle. */
+.header-actions-toggle {
+    display: none;
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: var(--fs-xl);
+    color: var(--text-title);
+    cursor: pointer;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+    transition: background-color var(--transition-fast);
+}
+.header-actions-toggle:hover { background-color: var(--gray-100); }
+.header-actions-toggle i { display: block; transition: transform var(--transition-base); }
+.header-actions-toggle[aria-expanded="false"] i { transform: rotate(180deg); }
+
 #sidebar-backdrop {
     display: none;
     position: fixed;
