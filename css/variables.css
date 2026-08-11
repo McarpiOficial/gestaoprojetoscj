@@ -1,0 +1,106 @@
+:root {
+    /* Cores base (compatibilidade com a Fase 1) */
+    --bg-primary: #f8fafc;
+    --sidebar-bg: #0f172a;
+    --sidebar-hover: #1e293b;
+    --sidebar-active: #38bdf8;
+    --text-main: #475569;
+    --text-title: #0f172a;
+    /* Ajustado de #94a3b8 para #64748b: o tom original media ~2.6:1 de
+       contraste sobre branco, abaixo do mínimo de 4.5:1 do WCAG AA. */
+    --text-muted: #64748b;
+    --card-bg: #ffffff;
+    --primary: #0284c7;
+    --primary-hover: #0369a1;
+    --border: #e2e8f0;
+
+    /* Escala neutra */
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+
+    /* Cores semânticas */
+    --color-primary: #0284c7;
+    --color-primary-hover: #0369a1;
+    --color-primary-light: #f0f9ff;
+    --color-primary-soft: #e0f2fe;
+
+    --color-success: #059669;
+    --color-success-strong: #10b981;
+    --color-success-light: #ecfdf5;
+    --color-success-soft: #d1fae5;
+
+    --color-danger: #dc2626;
+    --color-danger-strong: #ef4444;
+    --color-danger-light: #fef2f2;
+    --color-danger-soft: #fee2e2;
+
+    --color-warning: #d97706;
+    --color-warning-dark: #b45309;
+    --color-warning-strong: #ea580c;
+    --color-warning-light: #fffbeb;
+    --color-warning-soft: #fef3c7;
+
+    --color-violet: #6d28d9;
+    --color-violet-soft: #ede9fe;
+
+    --color-teal: #115e59;
+    --color-teal-soft: #ccfbf1;
+
+    /* Tipografia */
+    --font-family-base: 'Inter', sans-serif;
+    --fs-2xs: 9px;
+    --fs-xs: 11px;
+    --fs-sm: 12px;
+    --fs-base: 13px;
+    --fs-md: 14px;
+    --fs-lg: 15px;
+    --fs-xl: 16px;
+    --fs-2xl: 18px;
+    --fs-3xl: 20px;
+    --fs-4xl: 22px;
+    --fs-5xl: 24px;
+    --fs-6xl: 32px;
+    --fs-7xl: 42px;
+
+    --fw-normal: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+    --fw-extrabold: 800;
+
+    /* Espaçamento */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 32px;
+    --space-8: 40px;
+
+    /* Raio */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-pill: 9999px;
+
+    /* Sombra */
+    --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.12);
+    --shadow-xl: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+
+    /* Transição */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}

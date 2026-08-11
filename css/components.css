@@ -1,0 +1,398 @@
+.btn {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-md);
+    cursor: pointer;
+    transition: background-color var(--transition-base), transform var(--transition-fast), box-shadow var(--transition-base);
+    box-shadow: var(--shadow-xs);
+    white-space: nowrap;
+}
+
+.btn:hover { background-color: var(--color-primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.btn:active { transform: translateY(0); }
+
+.btn-secondary { background-color: var(--gray-500); }
+.btn-secondary:hover { background-color: var(--gray-600); }
+
+.btn-ghost { background-color: transparent; color: var(--text-title); border: 1px solid var(--border); box-shadow: none; }
+.btn-ghost:hover { background-color: var(--gray-100); color: var(--text-title); }
+
+.btn-drilldown-back { border: none; border-radius: var(--radius-sm); padding: 4px 10px; font-size: var(--fs-sm); font-weight: var(--fw-semibold); background-color: var(--gray-200); color: var(--text-title); cursor: pointer; transition: background-color var(--transition-fast); }
+.btn-drilldown-back:hover { background-color: var(--gray-300); }
+
+/* Banner de erro de sincronização */
+.fetch-error-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    background-color: var(--color-danger-light);
+    color: var(--color-danger);
+    border-bottom: 1px solid var(--color-danger-soft);
+    padding: var(--space-3) var(--space-7);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-semibold);
+    flex-shrink: 0;
+}
+.fetch-error-banner i { font-size: var(--fs-2xl); flex-shrink: 0; }
+.fetch-error-banner span { flex-grow: 1; }
+.fetch-error-banner .btn { padding: var(--space-2) var(--space-4); font-size: var(--fs-base); flex-shrink: 0; }
+
+/* Skeleton de carregamento */
+.skeleton {
+    display: inline-block;
+    color: transparent !important;
+    background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.2s ease-in-out infinite;
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+}
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Grid de Cartões Executivos (KPIs) */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.kpi-card {
+    background: var(--card-bg);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--gray-300);
+}
+
+.kpi-card-clickable { cursor: pointer; }
+.kpi-card-clickable:hover { border-color: var(--color-primary); }
+
+.kpi-card h3 {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    font-weight: var(--fw-semibold);
+}
+
+.kpi-card p {
+    font-size: var(--fs-5xl);
+    font-weight: var(--fw-extrabold);
+    color: var(--text-title);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Barra de Ferramentas / Ordenação */
+.table-toolbar {
+    background: var(--card-bg);
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.table-toolbar label {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-semibold);
+    color: var(--gray-500);
+}
+
+.select-sort {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: var(--fs-base);
+    color: var(--text-title);
+    outline: none;
+    background-color: var(--gray-50);
+    cursor: pointer;
+    font-weight: var(--fw-medium);
+    transition: border-color var(--transition-fast);
+}
+
+.select-sort:hover { border-color: var(--gray-300); }
+.select-sort:focus { border-color: var(--color-primary); }
+
+/* Régua de Avanço */
+.progress-wrapper { display: flex; align-items: center; gap: var(--space-3); width: 100%; }
+.progress-container { background: var(--gray-200); border-radius: var(--radius-pill); height: 10px; flex-grow: 1; overflow: hidden; position: relative; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); border: 1px solid var(--gray-300); }
+.progress-fill { height: 100%; border-radius: var(--radius-pill); background: linear-gradient(90deg, #38bdf8 0%, var(--color-primary) 100%); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.progress-fill.complete { background: linear-gradient(90deg, var(--color-success-strong) 0%, var(--color-success) 100%); }
+.progress-text { font-size: var(--fs-sm); font-weight: var(--fw-bold); color: var(--text-title); min-width: 36px; text-align: right; }
+.badge-na { color: var(--text-muted); font-style: italic; font-size: var(--fs-base); }
+
+/* Badges de Status */
+.badge-status { display: inline-block; padding: 6px 12px; border-radius: var(--radius-pill); font-size: var(--fs-xs); font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+/* Usa --color-primary-hover (não --color-primary) para atingir ~5.6:1 de contraste sobre o fundo claro (WCAG AA) */
+.status-em-andamento { border: 2px solid var(--color-primary-hover); color: var(--color-primary-hover); background: var(--color-primary-light); }
+.status-suspenso { background-color: var(--color-danger); color: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.status-aguardando { background-color: var(--color-warning-strong); color: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.status-encerrado { background-color: var(--color-success); color: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.status-backlog { background-color: var(--gray-500); color: #ffffff; }
+
+/* Badges de Prioridade */
+.badge-prio { display: inline-block; padding: 5px 10px; border-radius: var(--radius-sm); font-size: var(--fs-sm); font-weight: var(--fw-bold); text-transform: uppercase; white-space: nowrap; }
+/* color-danger/-warning-dark (não -strong) usados aqui por contraste — ver .importance-* abaixo */
+.prio-alta { background-color: var(--color-danger-soft); color: var(--color-danger); }
+.prio-media { background-color: var(--color-warning-soft); color: var(--color-warning-dark); }
+.prio-baixa { background-color: var(--color-teal-soft); color: var(--color-teal); }
+
+/* Badges de Classificação */
+.badge-classification { display: inline-block; padding: 6px 14px; border-radius: var(--radius-md); font-size: var(--fs-xs); font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 1px 2px rgba(0,0,0,0.08); white-space: nowrap; color: #ffffff; }
+.classification-iniciacao { background-color: #1e3a8a; }
+.classification-planejamento { background-color: var(--color-violet); }
+.classification-execucao { background-color: #065f46; }
+.classification-monitoramento { background-color: #c2410c; }
+.classification-geral { background-color: var(--gray-600); }
+
+/* Badges de Importância */
+.badge-importance { display: inline-block; padding: 4px 8px; border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: var(--fw-bold); margin: 2px; white-space: nowrap; }
+/* color-danger/-warning-dark (não -strong) usados aqui: mesma correção de contraste do .prio-* acima */
+.importance-alta { background-color: var(--color-danger-soft); color: var(--color-danger); }
+.importance-media { background-color: var(--color-warning-soft); color: var(--color-warning-dark); }
+.importance-baixa { background-color: var(--color-teal-soft); color: var(--color-teal); }
+.importance-plestr { background-color: var(--color-violet-soft); color: var(--color-violet); }
+.importance-plgov { background-color: var(--color-primary-soft); color: var(--color-primary-hover); }
+.importance-default { background-color: var(--gray-100); color: var(--gray-600); }
+
+/* Timeline visual do campo Andamento (modal de detalhe) */
+.andamento-timeline { display: flex; flex-direction: column; }
+.timeline-entry { display: flex; gap: var(--space-3); position: relative; padding-bottom: var(--space-4); }
+.timeline-entry:last-child { padding-bottom: 0; }
+.timeline-entry::before { content: ''; position: absolute; left: 5px; top: 16px; bottom: 0; width: 2px; background: var(--border); }
+.timeline-entry:last-child::before { display: none; }
+.timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--color-primary); flex-shrink: 0; margin-top: 3px; z-index: 1; }
+.timeline-date { font-size: var(--fs-sm); font-weight: var(--fw-bold); color: var(--color-primary-hover); margin-bottom: 2px; }
+.timeline-text { font-size: var(--fs-base); color: var(--text-main); line-height: 1.5; white-space: pre-wrap; }
+
+/* Indicadores de PMO derivados (Fase 5): atraso, estagnação, risco (RAG) e aging */
+.badge-atraso { display: inline-block; margin-top: 4px; background-color: var(--color-danger-soft); color: var(--color-danger); padding: 2px 8px; border-radius: var(--radius-sm); font-size: 10px; font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+
+.ticket-stagnant-flag { font-size: 10px; font-weight: var(--fw-semibold); color: var(--color-warning-dark); margin-top: 3px; text-transform: none; letter-spacing: 0; white-space: normal; }
+
+.badge-risk { display: inline-block; padding: 5px 10px; border-radius: var(--radius-sm); font-size: var(--fs-sm); font-weight: var(--fw-bold); text-transform: uppercase; white-space: nowrap; cursor: help; }
+.risk-alto { background-color: var(--color-danger-soft); color: var(--color-danger); }
+.risk-medio { background-color: var(--color-warning-soft); color: var(--color-warning-dark); }
+.risk-baixo { background-color: var(--color-success-soft); color: var(--color-success); }
+
+.badge-aging { display: inline-block; padding: 4px 10px; border-radius: var(--radius-pill); font-size: var(--fs-sm); font-weight: var(--fw-bold); white-space: nowrap; }
+.aging-ok { background-color: var(--color-success-soft); color: var(--color-success); }
+.aging-warning { background-color: var(--color-warning-soft); color: var(--color-warning-dark); }
+.aging-critical { background-color: var(--color-danger-soft); color: var(--color-danger); }
+
+/* Tooltip rico (tabela) do badge de Risco — elemento único flutuante, ver risk.js */
+.risk-tooltip-float {
+    display: none;
+    position: fixed;
+    z-index: 5000;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-4);
+    width: 340px;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+    overflow-y: auto;
+}
+.risk-tooltip-title { font-weight: var(--fw-extrabold); color: var(--text-title); margin-bottom: var(--space-3); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.4px; }
+.risk-tooltip-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); table-layout: fixed; }
+.risk-tooltip-table th { text-align: left; padding: 4px 6px; border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: var(--fs-xs); text-transform: uppercase; }
+/* font-size explícito (não só herdado de .risk-tooltip-table): a regra global de tables.css
+   (`td { font-size: var(--fs-md); ... }`, pensada para as tabelas de projeto) mira o <td>
+   diretamente, o que vence herança independente de especificidade — sem isto, o texto ficava
+   maior que o previsto, quebrava em mais linhas e inflava a altura do tooltip. */
+.risk-tooltip-table td { padding: 5px 6px; border-bottom: 1px dashed var(--border); color: var(--text-main); font-size: var(--fs-sm); line-height: 1.35; }
+.risk-tooltip-table th:nth-child(1), .risk-tooltip-table td:nth-child(1) { width: 34%; }
+.risk-tooltip-table th:nth-child(2), .risk-tooltip-table td:nth-child(2) { width: 46%; }
+.risk-tooltip-table th:nth-child(3), .risk-tooltip-table td:nth-child(3) { width: 20%; text-align: center; }
+.risk-tooltip-table tfoot td { border-bottom: none; border-top: 2px solid var(--border); padding-top: 6px; font-weight: var(--fw-bold); }
+
+/* A regra de responsive.css que transforma QUALQUER <table> em "cartões" empilhados no mobile
+   (table/tr/td vira display:block/flex — ver responsive.css) não é escopada só às tabelas de
+   projeto, então vazava para esta tabela também, inflando sua altura e derrubando o tooltip
+   para fora da tela. Restaura o layout de tabela de verdade, e vence por especificidade
+   (seletor com classe) independente de largura de viewport ou ordem de carregamento do CSS. */
+.risk-tooltip-table { display: table; width: 100%; }
+.risk-tooltip-table thead { display: table-header-group; }
+.risk-tooltip-table tbody { display: table-row-group; }
+.risk-tooltip-table tfoot { display: table-footer-group; }
+.risk-tooltip-table tr { display: table-row; }
+.risk-tooltip-table th, .risk-tooltip-table td { display: table-cell; width: auto; position: static; }
+.risk-tooltip-table td::before { content: none; }
+.risk-tooltip-result { margin-top: var(--space-3); font-size: var(--fs-sm); color: var(--text-main); }
+.risk-tooltip-level-alto { color: var(--color-danger); }
+.risk-tooltip-level-medio { color: var(--color-warning-dark); }
+.risk-tooltip-level-baixo { color: var(--color-success); }
+
+/* Quadro de Acompanhamento Prefeitura */
+.prefeitura-board { display: flex; flex-direction: column; gap: var(--space-6); }
+
+.prefeitura-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.prefeitura-card-header {
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--gray-800) 100%);
+    color: #ffffff;
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-extrabold);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.prefeitura-card-body {
+    padding: var(--space-5) var(--space-6);
+    display: flex;
+    flex-direction: column;
+}
+
+.prefeitura-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-2) 0;
+    border-bottom: 1px dashed var(--border);
+    flex-wrap: wrap;
+}
+
+.prefeitura-item:last-child { border-bottom: none; }
+
+/* Nível 0 de cada card (o primeiro item abaixo do tema) recebe destaque de "subtítulo";
+   níveis mais profundos (recuo calculado via padding-left inline por render-prefeitura.js)
+   ficam com texto mais discreto, sem precisar de classes por nível. */
+.prefeitura-item-heading { padding-top: var(--space-3); }
+.prefeitura-item-heading .prefeitura-item-text { font-weight: var(--fw-semibold); color: var(--text-title); }
+
+.prefeitura-item-text { font-size: var(--fs-sm); color: var(--text-muted); flex: 1; min-width: 200px; }
+.prefeitura-item-heading .prefeitura-item-text { font-size: var(--fs-md); }
+
+/* Botão Ações */
+.action-btn { background: none; border: none; cursor: pointer; font-size: var(--fs-xl); padding: var(--space-2); border-radius: var(--radius-sm); transition: background-color var(--transition-fast); }
+.action-btn:hover { background-color: var(--gray-100); }
+
+/* Grid Painel Indicadores */
+.dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+.chart-card { background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-6); min-height: 400px; position: relative; box-shadow: var(--shadow-sm); }
+.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); }
+.chart-title { font-size: var(--fs-lg); font-weight: var(--fw-bold); color: var(--text-title); text-transform: uppercase; letter-spacing: 0.3px; padding-left: var(--space-3); border-left: 3px solid var(--color-primary); }
+.chart-container-box { position: relative; height: 320px; width: 100%; }
+
+/* Legenda da regra de Impacto + legenda de quadrantes no gráfico Eisenhower */
+.eisenhower-rule-box {
+    background: var(--gray-50, #f8fafc);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    font-size: var(--fs-sm);
+    color: var(--text-main);
+}
+.eisenhower-rule-box strong { display: block; margin-bottom: var(--space-2); color: var(--text-title); font-weight: var(--fw-semibold); }
+.eisenhower-rule-tags { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.eisenhower-rule-tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: var(--fs-xs, 12px); font-weight: var(--fw-semibold); white-space: nowrap; }
+.eisenhower-rule-tag.eisenhower-rule-alta { background: var(--color-danger-soft); color: var(--color-danger); }
+.eisenhower-rule-tag.eisenhower-rule-media { background: #fef3c7; color: #b45309; }
+.eisenhower-rule-tag.eisenhower-rule-baixa { background: var(--gray-100); color: var(--gray-600); }
+
+.eisenhower-quadrant-legend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); margin-top: var(--space-4); font-size: var(--fs-xs, 12px); color: var(--text-muted); align-items: center; }
+.eisenhower-quadrant-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.eisenhower-quad-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+.eisenhower-quad-fazer { background: rgba(220, 38, 38, 0.45); }
+.eisenhower-quad-planejar { background: rgba(2, 132, 199, 0.45); }
+.eisenhower-quad-delegar { background: rgba(245, 158, 11, 0.5); }
+.eisenhower-quad-eliminar { background: rgba(100, 116, 139, 0.45); }
+.eisenhower-legend-note { font-style: italic; }
+
+/* Layout Gestão Interna */
+.gestao-interna-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    padding-bottom: var(--space-8);
+}
+
+.gi-group {
+    background-color: var(--group-bg);
+    border: 1px solid var(--group-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-7) var(--space-7);
+    box-shadow: var(--shadow-md);
+}
+
+.gi-group-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--fs-4xl);
+    font-weight: var(--fw-extrabold);
+    color: var(--group-text);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px dashed var(--group-border);
+}
+
+.gi-group-title i {
+    font-size: var(--fs-6xl);
+    font-weight: bold;
+}
+
+.gi-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-4);
+}
+
+.gi-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    border: 2px solid var(--btn-border);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-lg);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-xs);
+}
+
+.gi-btn:hover {
+    background-color: var(--btn-hover-bg);
+    color: var(--btn-hover-text);
+    border-color: var(--btn-hover-bg);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px var(--btn-shadow);
+}

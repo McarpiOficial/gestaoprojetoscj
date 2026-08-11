@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Projetos - CIJUN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+	<script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/tables.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/print.css" media="print">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" aria-label="Recolher menu" title="Recolher menu">
+            <i class="ph-bold ph-caret-left"></i>
+        </button>
+        <div class="sidebar-brand">CIJUN<span>Gestão de Projetos</span></div>
+        <ul class="sidebar-menu">
+            <li><button type="button" class="menu-item active" onclick="switchView('ativos', this)"><i class="ph-bold ph-play-circle"></i><span class="menu-label">Projetos Ativos DT</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('encerrados', this)"><i class="ph-bold ph-check-circle"></i><span class="menu-label">Projetos Encerr. DT</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('ciintec', this)"><i class="ph-bold ph-flask"></i><span class="menu-label">CIINTEC</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('parados', this)"><i class="ph-bold ph-pause-circle"></i><span class="menu-label">Projetos Parados DT</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('backlog', this)"><i class="ph-bold ph-stack"></i><span class="menu-label">Backlogs DT</span></button></li>
+			<li><button type="button" class="menu-item" onclick="switchView('suspensos', this)"><i class="ph-bold ph-prohibit"></i><span class="menu-label">Projetos Suspensos DT</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('carga-analista', this)"><i class="ph-bold ph-users-three"></i><span class="menu-label">Carga por Analista</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('secretaria', this)"><i class="ph-bold ph-buildings"></i><span class="menu-label">Visão por Secretaria</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('resumo-executivo', this)"><i class="ph-bold ph-presentation-chart"></i><span class="menu-label">Resumo Executivo</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('indicadores', this)"><i class="ph-bold ph-chart-bar"></i><span class="menu-label">Indicadores & Gráficos</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('gestao-interna', this)"><i class="ph-bold ph-briefcase"></i><span class="menu-label">Gestão Interna</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('estrutura-ferramentas', this)"><i class="ph-bold ph-wrench"></i><span class="menu-label">Estrutura Ferramentas</span></button></li>
+            <li><button type="button" class="menu-item" onclick="switchView('acompanhamento-prefeitura', this)"><i class="ph-bold ph-crown-simple"></i><span class="menu-label">Acompanh. Prefeitura</span></button></li>
+        </ul>
+    </aside>
+    <div id="sidebar-backdrop" onclick="closeSidebar()"></div>
+
+    <main class="main-content">
+		<header class="top-header">
+			<div class="header-title-row">
+				<button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Abrir menu"><i class="ph-bold ph-list"></i></button>
+				<div class="header-title">
+					<h1 id="view-title">Projetos Ativos DT</h1>
+					<p>Mecanismo Isolado Estável • Sincronização Dinâmica Local • Último Update: <span id="update-timestamp">Sincronizando...</span></p>
+				</div>
+			</div>
+			<div style="display: flex; gap: 12px; align-items: center;">
+				<input type="text" id="input-busca" placeholder="Buscar projeto ou ticket..." style="padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; width: 280px; outline: none;" oninput="resetSearch()" aria-describedby="search-feedback">
+				<span id="search-feedback" role="status" style="font-size: 13px; font-weight: 600; color: var(--color-danger); white-space: nowrap;"></span>
+                <div style="position: relative; display: flex; width: 100%;">
+                    <button class="btn" style="width: 100%;" onclick="buscarProjeto()">🔍 Buscar</button>
+                    <span id="search-badge" style="display: none; position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: bold; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></span>
+                </div>
+				<button class="btn btn-secondary" onclick="exportActiveTableToCSV()" title="Exportar a tabela da tela atual para CSV"><i class="ph-bold ph-file-csv"></i> CSV</button>
+				<button class="btn btn-secondary" onclick="window.print()" title="Imprimir ou exportar a tela atual para PDF"><i class="ph-bold ph-printer"></i> Imprimir</button>
+				<button id="btn-atualizar-dados" class="btn" onclick="fetchSpreadsheetData()">Atualizar Dados (F5)</button>
+			</div>
+		</header>
+
+		<div id="fetch-error-banner" class="fetch-error-banner" style="display:none;" role="alert">
+			<i class="ph-bold ph-warning-circle"></i>
+			<span>Não foi possível sincronizar os dados da planilha. Verifique sua conexão.</span>
+			<button class="btn btn-secondary" onclick="fetchSpreadsheetData()">Tentar novamente</button>
+		</div>
+
+        <div class="view-container">
+
+            <section id="pane-ativos" class="view-pane active">
+                <div style="display: flex; gap: 16px; margin-bottom: 16px; align-items: stretch; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 320px; background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03); display: flex; flex-direction: column;">
+                        <h3 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.75px; font-weight: 600; margin-bottom: 8px;">Projetos Ativos por Setor</h3>
+                        <div id="ativos-por-setor" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; align-content: start;">
+                            <div style="color:var(--text-muted); font-size: 13px;">Carregando...</div>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; min-width: 260px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div class="kpi-card" style="padding: 10px 12px; justify-content: center; gap: 2px;">
+                            <h3 style="font-size: 9px; margin-bottom: 2px;">Em Execução</h3>
+                            <p id="count-ativos" style="font-size: 20px;">0</p>
+                        </div>
+                        <div class="kpi-card" style="padding: 10px 12px; justify-content: center; gap: 2px;">
+                            <h3 style="font-size: 9px; margin-bottom: 2px;">Média Progresso</h3>
+                            <p id="avg-progress-ativos" style="color: var(--primary); font-size: 20px;">0%</p>
+                        </div>
+                        <div class="kpi-card" style="padding: 10px 12px; justify-content: center; gap: 2px;">
+                            <h3 style="font-size: 9px; margin-bottom: 2px;">Projetos PL.ESTR</h3>
+                            <p id="count-pl-estr" style="color: #6d28d9; font-size: 20px;">0</p>
+                        </div>
+                        <div class="kpi-card" style="padding: 10px 12px; justify-content: center; gap: 2px;">
+                            <h3 style="font-size: 9px; margin-bottom: 2px;">Projetos PL.GOV</h3>
+                            <p id="count-pl-gov" style="color: #0f172a; font-size: 20px;">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-toolbar">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-right: auto;">
+                        <input type="checkbox" id="group-priority-ativos" onchange="renderCategoryPanes(activeSorts.ativos, activeSorts.parados, activeSorts.backlog, activeSorts.suspensos, activeSorts.encerrados, activeSorts.ciintec)">
+                        <label for="group-priority-ativos" style="cursor: pointer; margin: 0;">Agrupar por Prioridade</label>
+                    </div>
+                    <label>Ordenar por:</label>
+                    <select class="select-sort" onchange="sortDataAndRender('ativos', this.value)">
+                        <option value="none">Padrão Planilha</option>
+                        <option value="secretaria">Secretaria</option>
+                        <option value="prioridade">Prioridade</option>
+                        <option value="classificacao">Classificação</option>
+                        <option value="importancia">Importância</option>
+                        <option value="risco">Risco</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th class="col-ticket">Ticket / Nome do Projeto</th><th class="col-sec">Secretaria</th><th class="col-class">Classificação</th><th class="col-status">Status</th><th class="col-regua" title="Percentual estimado pela proporção do tempo decorrido entre Dt. Início e Dt. Fim — não é o progresso real reportado pelo analista.">Avanço p/ DT. ENTREGA ⓘ</th><th class="col-importancia">Importância</th><th class="col-risco" title="Score calculado a partir de atraso, estagnação, prioridade e importância (PL.ESTR/PL.GOV)">Risco</th><th class="col-acoes">Ações</th></tr></thead>
+                        <tbody id="table-ativos-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- PANE CIINTEC -->
+            <section id="pane-ciintec" class="view-pane">
+                <div class="kpi-grid">
+                    <div class="kpi-card"><h3>Projetos CIINTEC</h3><p id="count-ciintec">0</p></div>
+                    <div class="kpi-card"><h3>Média de Progresso</h3><p id="avg-progress-ciintec" style="color: var(--primary);">0%</p></div>
+                    <div class="kpi-card"><h3>Projetos PL.ESTR</h3><p id="count-pl-estr-ciintec" style="color: #6d28d9;">0</p></div>
+                    <div class="kpi-card"><h3>Projetos PL.GOV</h3><p id="count-pl-gov-ciintec" style="color: #0f172a;">0</p></div>
+                </div>
+                <div class="table-toolbar">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-right: auto;">
+                        <input type="checkbox" id="group-priority-ciintec" onchange="renderCategoryPanes(activeSorts.ativos, activeSorts.parados, activeSorts.backlog, activeSorts.suspensos, activeSorts.encerrados, activeSorts.ciintec)">
+                        <label for="group-priority-ciintec" style="cursor: pointer; margin: 0;">Agrupar por Prioridade</label>
+                    </div>
+                    <label>Ordenar por:</label>
+                    <select class="select-sort" onchange="sortDataAndRender('ciintec', this.value)">
+                        <option value="none">Padrão Planilha</option>
+                        <option value="secretaria">Secretaria</option>
+                        <option value="prioridade">Prioridade</option>
+                        <option value="classificacao">Classificação</option>
+                        <option value="importancia">Importância</option>
+                        <option value="risco">Risco</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th class="col-ticket">Ticket / Nome do Projeto</th><th class="col-sec">Secretaria</th><th class="col-class">Classificação</th><th class="col-status">Status</th><th class="col-regua" title="Percentual estimado pela proporção do tempo decorrido entre Dt. Início e Dt. Fim — não é o progresso real reportado pelo analista.">Avanço p/ DT. ENTREGA ⓘ</th><th class="col-importancia">Importância</th><th class="col-risco" title="Score calculado a partir de atraso, estagnação, prioridade e importância (PL.ESTR/PL.GOV)">Risco</th><th class="col-acoes">Ações</th></tr></thead>
+                        <tbody id="table-ciintec-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="pane-parados" class="view-pane">
+                <div class="kpi-grid">
+                    <div class="kpi-card"><h3>Projetos Retidos</h3><p id="count-parados">0</p></div>
+                    <div class="kpi-card"><h3>Aguardando Definição</h3><p id="alert-parados" style="color: #ea580c; font-size: 22px; font-weight:700;">Atenção Requerida</p></div>
+                </div>
+                <div class="table-toolbar">
+                    <label>Ordenar por:</label>
+                    <select class="select-sort" onchange="sortDataAndRender('parados', this.value)">
+                        <option value="none">Padrão Planilha</option>
+                        <option value="secretaria">Secretaria</option>
+                        <option value="prioridade">Prioridade</option>
+                        <option value="classificacao">Classificação</option>
+                        <option value="importancia">Importância</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th class="col-ticket">Ticket / Nome do Projeto</th><th class="col-sec">Secretaria</th><th class="col-class">Classificação</th><th class="col-status">Status</th><th class="col-prioridade">Prioridade</th><th class="col-importancia">Importância</th><th class="col-aging" title="Dias desde a última atualização registrada (Ult. Atualiz.) — usado como aproximação de há quanto tempo o item está nesta condição">Há Quanto Tempo</th><th class="col-acoes">Ações</th></tr></thead>
+                        <tbody id="table-parados-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="pane-backlog" class="view-pane">
+                <div class="kpi-grid"><div class="kpi-card"><h3>Projetos em Backlog</h3><p id="count-backlog">0</p></div></div>
+                <div class="table-toolbar">
+                    <label>Ordenar por:</label>
+                    <select class="select-sort" onchange="sortDataAndRender('backlog', this.value)">
+                        <option value="none">Padrão Planilha</option>
+                        <option value="secretaria">Secretaria</option>
+                        <option value="prioridade">Prioridade</option>
+                        <option value="classificacao">Classificação</option>
+                        <option value="importancia">Importância</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th class="col-ticket">Ticket / Nome do Projeto</th><th class="col-sec">Secretaria</th><th class="col-class">Classificação</th><th class="col-prioridade">Prioridade</th><th class="col-importancia">Importância</th><th class="col-aging" title="Dias desde a última atualização registrada (Ult. Atualiz.)">Há Quanto Tempo</th><th class="col-acoes">Ações</th></tr></thead>
+                        <tbody id="table-backlog-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+			<section id="pane-suspensos" class="view-pane">
+                <div class="kpi-grid"><div class="kpi-card"><h3>Total Suspensos</h3><p id="count-suspensos" style="color: #dc2626;">0</p></div></div>
+                <div class="table-toolbar">
+                    <label>Ordenar por:</label>
+                    <select class="select-sort" onchange="sortDataAndRender('suspensos', this.value)">
+                        <option value="none">Padrão Planilha</option>
+                        <option value="secretaria">Secretaria</option>
+                        <option value="prioridade">Prioridade</option>
+                        <option value="classificacao">Classificação</option>
+                        <option value="importancia">Importância</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th class="col-ticket">Ticket / Nome do Projeto</th><th class="col-sec">Secretaria</th><th class="col-class">Classificação</th><th class="col-status">Status</th><th class="col-regua" title="Percentual estimado pela proporção do tempo decorrido entre Dt. Início e Dt. Fim — não é o progresso real reportado pelo analista.">Avanço p/ DT. ENTREGA ⓘ</th><th class="col-importancia">Importância</th><th class="col-aging" title="Dias desde a última atualização registrada (Ult. Atualiz.) — usado como aproximação de há quanto tempo o item está suspenso">Há Quanto Tempo</th><th class="col-acoes">Ações</th></tr></thead>
+                        <tbody id="table-suspensos-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="pane-encerrados" class="view-pane">
+                <div style="display: flex; gap: 16px; margin-bottom: 16px; align-items: stretch; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 320px; background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03); display: flex; flex-direction: column;">
+                        <h3 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.75px; font-weight: 600; margin-bottom: 8px;">Projetos Encerrados por Setor</h3>
+                        <div id="encerrados-por-setor" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; align-content: start;">
+                            <div style="color:var(--text-muted); font-size: 13px;">Carregando...</div>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; min-width: 150px; display: flex;">
+                        <div class="kpi-card" style="padding: 10px 12px; justify-content: center; gap: 2px; flex-grow: 1;">
+                            <h3 style="font-size: 9px; margin-bottom: 2px;">Projetos Finalizados</h3>
+                            <p id="count-encerrados" style="color: #059669; font-size: 20px;">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-toolbar">
+                    <label>Ordenar por:</label>
+                    <select class="select-sort" onchange="sortDataAndRender('encerrados', this.value)">
+                        <option value="none">Padrão Planilha</option>
+                        <option value="secretaria">Secretaria</option>
+                        <option value="prioridade">Prioridade</option>
+                        <option value="classificacao">Classificação</option>
+                        <option value="importancia">Importância</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th class="col-ticket">Ticket / Nome do Projeto</th><th class="col-sec">Secretaria</th><th class="col-class">Classificação</th><th class="col-status">Status</th><th class="col-prioridade">Prioridade</th><th class="col-entregue">Entregue Em</th><th class="col-importancia">Importância</th><th class="col-acoes">Ações</th></tr></thead>
+                        <tbody id="table-encerrados-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+			<section id="pane-carga-analista" class="view-pane">
+				<div style="display: flex; gap: 12px; margin-bottom: 20px;">
+					<button id="workload-btn-dt" class="btn" style="background-color: var(--primary-hover); flex: 1; font-size: 15px;" onclick="setWorkloadSource('ativos')">Projetos DT</button>
+					<button id="workload-btn-ciintec" class="btn" style="background-color: var(--gray-500); flex: 1; font-size: 15px;" onclick="setWorkloadSource('ciintec')">Projetos CIINTEC</button>
+				</div>
+				<div class="kpi-grid">
+					<div class="kpi-card"><h3>Analistas com Projetos Ativos</h3><p id="count-analistas">0</p></div>
+					<div class="kpi-card"><h3>Analistas Sobrecarregados</h3><p id="count-analistas-sobrecarga" style="color: #dc2626;">0</p></div>
+				</div>
+				<div class="table-toolbar" style="justify-content: flex-start;">
+					<span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Sobrecarga: ≥3 projetos de alta prioridade ou ≥6 projetos ativos simultâneos por analista.</span>
+				</div>
+				<div class="table-responsive">
+					<table>
+						<thead><tr><th class="col-ticket">Analista</th><th style="text-align:center;">Projetos Ativos</th><th style="text-align:center;">Alta Prioridade</th><th style="text-align:center;">Média Prioridade</th><th style="text-align:center;">Baixa Prioridade</th><th style="text-align:center;">Alerta</th></tr></thead>
+						<tbody id="table-carga-analista-body"></tbody>
+					</table>
+				</div>
+			</section>
+
+			<section id="pane-secretaria" class="view-pane">
+				<div style="display: flex; gap: 12px; margin-bottom: 20px;">
+					<button id="secretaria-btn-dt" class="btn" style="background-color: var(--primary-hover); flex: 1; font-size: 15px;" onclick="setSecretariaSource('ativos')">Projetos DT</button>
+					<button id="secretaria-btn-ciintec" class="btn" style="background-color: var(--gray-500); flex: 1; font-size: 15px;" onclick="setSecretariaSource('ciintec')">Projetos CIINTEC</button>
+				</div>
+				<div class="table-toolbar" style="justify-content: flex-start; gap: 16px;">
+					<label for="select-secretaria" style="font-weight: 700; color: var(--text-title);">Secretaria:</label>
+					<select id="select-secretaria" class="select-sort" onchange="renderVisaoSecretaria(this.value)" style="min-width: 240px;">
+						<option value="">Selecione uma secretaria...</option>
+					</select>
+					<label for="select-sort-secretaria">Ordenar por:</label>
+					<select id="select-sort-secretaria" class="select-sort" onchange="sortSecretariaAndRender(this.value)">
+						<option value="ticket">Ticket (A-Z)</option>
+						<option value="classificacao">Classificação</option>
+						<option value="prioridade">Prioridade</option>
+						<option value="importancia">Importância</option>
+					</select>
+					<span style="font-size: 12px; color: var(--text-muted);">Tela pensada para compartilhar isoladamente com a secretaria, sem expor o portfólio inteiro.</span>
+				</div>
+				<div id="secretaria-content">
+					<div style="text-align:center; padding:48px; color:var(--text-muted);">Selecione uma secretaria acima para ver o resumo dos seus projetos.</div>
+				</div>
+			</section>
+
+			<section id="pane-resumo-executivo" class="view-pane">
+				<div style="display: flex; gap: 12px; margin-bottom: 20px;">
+					<button id="exec-btn-dt" class="btn" style="background-color: var(--primary-hover); flex: 1; font-size: 15px;" onclick="setExecSource('ativos')">Projetos DT</button>
+					<button id="exec-btn-ciintec" class="btn" style="background-color: var(--gray-500); flex: 1; font-size: 15px;" onclick="setExecSource('ciintec')">Projetos CIINTEC</button>
+				</div>
+				<div class="kpi-grid">
+					<div class="kpi-card"><h3>Projetos Ativos</h3><p id="exec-count-ativos">0</p></div>
+					<div class="kpi-card"><h3>Progresso Médio</h3><p id="exec-avg-progress" style="color: var(--color-primary);">0%</p></div>
+					<div class="kpi-card kpi-card-clickable" onclick="showAtrasoPopup()" title="Clique para ver a lista"><h3>Em Atraso</h3><p id="exec-count-atraso" style="color: var(--color-danger);">0</p></div>
+					<div class="kpi-card kpi-card-clickable" onclick="showEstagnadosPopup()" title="Clique para ver a lista"><h3 id="exec-card-estagnados-title">Estagnados (sem update)</h3><p id="exec-count-estagnados" style="color: var(--color-warning-dark);">0</p></div>
+					<div class="kpi-card"><h3>Aguardando Terceiros</h3><p id="exec-count-aguardando" style="color: var(--color-warning-strong);">0</p></div>
+					<div class="kpi-card kpi-card-clickable" onclick="showEntreguesMesPopup()" id="exec-card-entregues-title" title="Clique para ver a lista"><h3>Entregues Este Mês</h3><p id="exec-count-entregues-mes" style="color: var(--color-success);">0</p></div>
+				</div>
+				<div class="dashboard-grid">
+					<div class="chart-card" style="min-height: auto;">
+						<div class="chart-title" style="margin-bottom: 16px;">Top 5 Riscos do Portfólio</div>
+						<div class="table-responsive" style="max-height: 360px;">
+							<table>
+								<thead><tr><th class="col-ticket">Ticket</th><th class="col-sec">Secretaria</th><th style="text-align:center;">Risco</th><th class="col-acoes">Ações</th></tr></thead>
+								<tbody id="exec-top-riscos-body"></tbody>
+							</table>
+						</div>
+					</div>
+					<div class="chart-card" style="min-height: auto;">
+						<div class="chart-title" style="margin-bottom: 16px;">Aguardando Terceiros (Cliente/Presidente)</div>
+						<div class="table-responsive" style="max-height: 360px;">
+							<table>
+								<thead><tr><th class="col-ticket">Ticket</th><th class="col-sec">Secretaria</th><th style="text-align:center;">Status</th><th class="col-acoes">Ações</th></tr></thead>
+								<tbody id="exec-aguardando-body"></tbody>
+							</table>
+						</div>
+					</div>
+					<div class="chart-card" style="min-height: auto; grid-column: 1 / -1;">
+						<div class="chart-title" id="exec-atraso-entrega-title" style="margin-bottom: 16px;">Projetos Atrasados para Entrega</div>
+						<div class="table-responsive" style="max-height: 360px;">
+							<table>
+								<thead><tr><th class="col-ticket">Ticket</th><th class="col-sec">Secretaria</th><th style="text-align:center;">Dias em Atraso</th><th style="text-align:center;">Dias sem Atualização</th><th class="col-acoes">Ações</th></tr></thead>
+								<tbody id="exec-atraso-entrega-body"></tbody>
+							</table>
+						</div>
+					</div>
+					<div class="chart-card" style="min-height: auto; grid-column: 1 / -1;">
+						<div class="chart-title" id="exec-atraso-atualizacao-title" style="margin-bottom: 16px;">Projetos com Atraso de Atualização</div>
+						<div class="table-responsive" style="max-height: 360px;">
+							<table>
+								<thead><tr><th class="col-ticket">Ticket</th><th class="col-sec">Secretaria</th><th style="text-align:center;">Dias sem Atualização</th><th style="text-align:center;">Risco</th><th class="col-acoes">Ações</th></tr></thead>
+								<tbody id="exec-atraso-atualizacao-body"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="pane-indicadores" class="view-pane">
+                <!-- Barra de Filtro por Período (Últ. Atualiz.) -->
+                <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <span style="font-size: 13px; font-weight: 700; color: var(--text-title); text-transform: uppercase; letter-spacing: 0.5px;">Filtrar Período (Ult. Atualiz.):</span>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label for="chart-date-start" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">De:</label>
+                            <input type="date" id="chart-date-start" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px; outline: none; background-color: #f8fafc;" onchange="applyChartDateFilter()">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label for="chart-date-end" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Até:</label>
+                            <input type="date" id="chart-date-end" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px; outline: none; background-color: #f8fafc;" onchange="applyChartDateFilter()">
+                        </div>
+                        <button class="btn" style="padding: 8px 14px; font-size: 13px;" onclick="applyChartDateFilter()">📅 Filtrar</button>
+                        <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;" onclick="clearChartDateFilter()">Limpar Filtro</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div id="chart-filter-status" style="font-size: 12px; font-weight: 600; color: var(--primary);"></div>
+                        <button class="btn btn-ghost" style="padding: 6px 14px; font-size: 12px;" onclick="openIndicatorRulesModal()" title="Ver regras de cálculo dos indicadores"><i class="ph-bold ph-info"></i> Regras</button>
+                    </div>
+                </div>
+
+                <!-- Botões de Controle da Fonte de Dados dos Gráficos -->
+                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                    <button id="btn-chart-dt" class="btn" style="background-color: var(--primary-hover); flex: 1; font-size: 15px;" onclick="setChartSource('ativos')">Projetos DT</button>
+                    <button id="btn-chart-ciintec" class="btn" style="background-color: #64748b; flex: 1; font-size: 15px;" onclick="setChartSource('ciintec')">Projetos CIINTEC</button>
+                </div>
+
+				<div class="dashboard-grid">
+					<div class="chart-card" id="card-gantt" style="order: 1;">
+						<div class="chart-title" id="chart-title-gantt" style="margin-bottom:20px;">Projetos DT - AVANÇO PARA ENTREGA</div>
+						<div class="chart-container-box" style="overflow-y: auto; overflow-x: hidden;">
+							<div id="gantt-wrapper" style="position: relative; width: 100%;"><canvas id="chartGantt"></canvas></div>
+						</div>
+					</div>
+
+                    <div class="chart-card" id="card-encerrados" style="order: 2;">
+						<div class="chart-title" id="chart-title-encerrados" style="margin-bottom:20px;">Projetos DT - ENCERRADOS POR IMPORTÂNCIA</div>
+						<div class="chart-container-box"><canvas id="chartEncerradosImp"></canvas></div>
+					</div>
+
+                    <!-- Gráfico de Backlog -->
+                    <div class="chart-card" id="card-backlog" style="order: 3; display: none;">
+                        <div class="chart-title" id="chart-title-backlog" style="margin-bottom:20px;">Projetos CIINTEC - BACKLOG</div>
+                        <div class="chart-container-box" style="overflow-y: auto; overflow-x: hidden;">
+                            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                                <thead>
+                                    <tr style="background-color: #f8fafc; border-bottom: 1px solid var(--border);">
+                                        <th style="padding: 10px 12px; font-size: 11px; color: #475569; text-transform: uppercase;">Ticket</th>
+                                        <th style="padding: 10px 12px; font-size: 11px; color: #475569; text-transform: uppercase;">Analista</th>
+                                        <th style="padding: 10px 12px; font-size: 11px; color: #475569; text-transform: uppercase; text-align: center;">Importância</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="backlog-list-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+					<div class="chart-card" id="card-pie" style="order: 4;">
+						<div class="chart-header">
+							<div class="chart-title" id="pie-chart-title">Projetos DT - Distribuição por Classificação</div>
+							<button id="btn-back-drilldown" class="btn-drilldown-back" style="display:none;" onclick="resetPieDrilldown()">← Voltar</button>
+						</div>
+						<div class="chart-container-box"><canvas id="chartPieDistribution"></canvas></div>
+					</div>
+
+					<div class="chart-card" id="card-priority" style="order: 5;">
+						<div class="chart-title" id="chart-title-priority" style="margin-bottom:20px;">Projetos DT - Matriz de Prioridades</div>
+						<div class="chart-container-box"><canvas id="chartPriority"></canvas></div>
+					</div>
+
+					<div class="chart-card" id="card-importance" style="order: 6;">
+						<div class="chart-title" id="chart-title-importance" style="margin-bottom:20px;">Projetos DT - Grau de Importância do Portfólio</div>
+						<div class="chart-container-box"><canvas id="chartImportance"></canvas></div>
+					</div>
+
+					<div class="chart-card" id="card-status" style="order: 7;">
+						<div class="chart-title" id="chart-title-status" style="margin-bottom:20px;">Projetos DT - Situação do Portfólio</div>
+						<div class="chart-container-box"><canvas id="chartStatusGeral"></canvas></div>
+					</div>
+
+					<div class="chart-card" id="card-eisenhower" style="order: 8;">
+						<div class="chart-title" style="margin-bottom:12px;">Matriz Urgência × Impacto (Eisenhower)</div>
+						<div class="eisenhower-rule-box">
+							<strong>Como o Impacto (eixo Y) é calculado a partir das tags de Importância:</strong>
+							<div class="eisenhower-rule-tags">
+								<span class="eisenhower-rule-tag eisenhower-rule-alta">PL.GOV · PL.ESTR · Mudança de Lei → Alta</span>
+								<span class="eisenhower-rule-tag eisenhower-rule-media">Política · Técnica Interna → Média</span>
+								<span class="eisenhower-rule-tag eisenhower-rule-baixa">Demais tags (ex.: Comercial Cijun) → Baixa</span>
+							</div>
+						</div>
+						<div class="chart-container-box"><canvas id="chartEisenhower"></canvas></div>
+						<div class="eisenhower-quadrant-legend">
+							<span><i class="eisenhower-quad-swatch eisenhower-quad-fazer"></i>Fazer Agora — urgente e importante</span>
+							<span><i class="eisenhower-quad-swatch eisenhower-quad-planejar"></i>Planejar — importante, não urgente</span>
+							<span><i class="eisenhower-quad-swatch eisenhower-quad-delegar"></i>Delegar — urgente, pouco importante</span>
+							<span><i class="eisenhower-quad-swatch eisenhower-quad-eliminar"></i>Eliminar/Revisar — nem urgente nem importante</span>
+							<span class="eisenhower-legend-note"><i class="ph-bold ph-circle"></i> tamanho da bolha = quantidade de projetos</span>
+							<span class="eisenhower-legend-note"><i class="ph-bold ph-cursor-click"></i> passe o mouse (ou toque) na bolha para ver os projetos</span>
+						</div>
+					</div>
+
+					<div class="chart-card" id="card-deliveries-trend" style="order: 9;">
+						<div class="chart-title" style="margin-bottom:20px;" title="Depende da extração automática de datas do texto de Andamento na aba Finalizados — entregas sem data reconhecível no texto não aparecem aqui.">Projetos DT - Entregas por Mês ⓘ</div>
+						<div class="chart-container-box"><canvas id="chartDeliveriesTrend"></canvas></div>
+					</div>
+				</div>
+			</section>
+
+            <section id="pane-gestao-interna" class="view-pane">
+                <div id="gestao-interna-content" class="gestao-interna-container">
+                    <div style="text-align:center; padding:32px; color:var(--text-muted);">Sincronizando dados de Gestão Interna...</div>
+                </div>
+            </section>
+
+            <section id="pane-estrutura-ferramentas" class="view-pane">
+                <div class="gestao-interna-container">
+                    <div style="text-align: right; color: #dc2626; font-size: 13px; font-weight: 700; margin-bottom: 8px;">Atualizado em 26/07/2026</div>
+
+                    <div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);">
+                        <h2 class="gi-group-title" style="color: #065f46;"><i class="ph-bold ph-presentation-chart"></i> Quadro de Projetos Ativos</h2>
+
+                        <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                            <div class="kpi-card" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; grid-column: 1 / -1; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 24px 32px;">
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <h3 style="color: #e0f2fe; font-size: 14px; font-weight: 600;">PORTFÓLIO TOTAL EM EXECUÇÃO</h3>
+                                    <span style="font-size: 13px; color: #bae6fd;">Inclui todos os projetos técnicos e terceiros mapeados</span>
+                                </div>
+                                <p style="color: white; font-size: 42px; margin: 0; font-weight: 800;">179</p>
+                            </div>
+
+                            <div class="kpi-card"><h3>WORDPRESS</h3><p>98</p></div>
+                            <div class="kpi-card"><h3>VISUAL BASIC / DX</h3><p>47</p></div>
+                            <div class="kpi-card"><h3>.NET - WEBFORMS</h3><p>45</p></div>
+                            <div class="kpi-card"><h3>.NET - MVC</h3><p>34</p></div>
+                            <div class="kpi-card"><h3>SPA</h3><p>27</p></div>
+                            <div class="kpi-card"><h3>PHP</h3><p>21</p></div>
+                            <div class="kpi-card"><h3>TERCEIROS</h3><p>7</p></div>
+                            <div class="kpi-card"><h3>MOBILE</h3><p>5</p></div>
+                            <div class="kpi-card"><h3>CHATBOT</h3><p>3</p></div>
+                            <div class="kpi-card"><h3>GEOTECNOLOGIAS</h3><p>1</p></div>
+                        </div>
+                    </div>
+
+                    <div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);">
+                        <h2 class="gi-group-title" style="color: #065f46;"><i class="ph-bold ph-database"></i> Estrutura de Banco de Dados</h2>
+
+                        <ul style="list-style: none; padding: 0; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                            <li style="padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: #f8fafc; color: var(--text-title); display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);">
+                                <i class="ph-fill ph-hard-drives" style="font-size: 32px; color: #0284c7;"></i>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-weight: 700; font-size: 16px;">Informix</span>
+                                    <span style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Banco principal/legado</span>
+                                </div>
+                            </li>
+                            <li style="padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: #f8fafc; color: var(--text-title); display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);">
+                                <i class="ph-fill ph-hard-drives" style="font-size: 32px; color: #0284c7;"></i>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-weight: 700; font-size: 16px;">Mysql</span>
+                                    <span style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">GW, registros históricos do informix e logs</span>
+                                </div>
+                            </li>
+                            <li style="padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: #f8fafc; color: var(--text-title); display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);">
+                                <i class="ph-fill ph-hard-drives" style="font-size: 32px; color: #0284c7;"></i>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-weight: 700; font-size: 16px;">Firebase</span>
+                                    <span style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Gestão de aplicativos mobile (app)</span>
+                                </div>
+                            </li>
+                            <li style="padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: #f8fafc; color: var(--text-title); display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);">
+                                <i class="ph-fill ph-hard-drives" style="font-size: 32px; color: #0284c7;"></i>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-weight: 700; font-size: 16px;">Oracle</span>
+                                    <span style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Sistema e banco de Recursos Humanos (RH)</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);">
+                        <h2 class="gi-group-title" style="color: #065f46;"><i class="ph-bold ph-tree-structure"></i> Organograma DT e CIINTEC</h2>
+
+                        <div style="text-align: center; margin-bottom: 32px; padding: 20px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px;">
+                            <img src="https://lh3.googleusercontent.com/d/1O3V8juZ-00RfgnKc3VfQy3ywl90h7FHs"
+								 alt="Organograma DT e CIINTEC"
+								 style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s ease;"
+								 onclick="openImageModal()"
+								 onmouseover="this.style.transform='scale(1.02)'"
+								 onmouseout="this.style.transform='scale(1)'"
+								 title="Clique para ampliar">
+                        </div>
+
+                        <h2 class="gi-group-title" style="color: #065f46; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 12px;"><i class="ph-bold ph-users-three"></i> ESTRUTURA DT (52 profissionais)</div>
+                            <span style="background-color: var(--sidebar-bg); color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;">2 Gerentes e 4 Coordenadores</span>
+                        </h2>
+
+                        <div style="margin-bottom: 32px;">
+                            <h4 style="font-size: 15px; color: var(--text-title); font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">DTGI (Gerência de Inteligência de Dados e Aplicações) - Gerente Thiago</h4>
+                            <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 0;">
+                                <div class="kpi-card" style="background-color: #f8fafc;">
+                                    <h3 style="font-size: 15px; color: var(--primary); font-weight: 800; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">DTW (Coord. Erika)</h3>
+                                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin:0; padding:0; color: var(--text-main);">
+                                        <li style="display: flex; justify-content: space-between;"><span>Site</span> <strong>2 analistas</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>App</span> <strong>2 analistas</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>IA</span> <strong>1 analista</strong></li>
+                                    </ul>
+                                </div>
+                                <div class="kpi-card" style="background-color: #f8fafc;">
+                                    <h3 style="font-size: 15px; color: var(--primary); font-weight: 800; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">DTG (Coord. Thiago - Acumulado)</h3>
+                                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin:0; padding:0; color: var(--text-main);">
+                                        <li style="display: flex; justify-content: space-between;"><span>Geo</span> <strong>2 analistas</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>BI</span> <strong>2 analistas</strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 32px;">
+                            <h4 style="font-size: 15px; color: var(--text-title); font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">DTGD (Gerência de Desenvolvimento de Sistemas) - Gerente João</h4>
+                            <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 0;">
+                                <div class="kpi-card" style="background-color: #f8fafc;">
+                                    <h3 style="font-size: 15px; color: var(--primary); font-weight: 800; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">DTS (Coord. Marina)</h3>
+                                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin:0; padding:0; color: var(--text-main);">
+                                        <li style="display: flex; justify-content: space-between;"><span>Analistas</span> <strong>6</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>Programadores</span> <strong>8</strong></li>
+                                    </ul>
+                                </div>
+                                <div class="kpi-card" style="background-color: #f8fafc;">
+                                    <h3 style="font-size: 15px; color: var(--primary); font-weight: 800; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">DTP (Coord. Rogério)</h3>
+                                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin:0; padding:0; color: var(--text-main);">
+                                        <li style="display: flex; justify-content: space-between;"><span>Analistas</span> <strong>8</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>Programadores</span> <strong>9</strong></li>
+                                    </ul>
+                                </div>
+                                <div class="kpi-card" style="background-color: #f8fafc;">
+                                    <h3 style="font-size: 15px; color: var(--primary); font-weight: 800; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">DTD (Coord. Natália)</h3>
+                                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin:0; padding:0; color: var(--text-main);">
+                                        <li style="display: flex; justify-content: space-between;"><span>DBA</span> <strong>2</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>Estagiários</span> <strong>5</strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 32px;">
+                            <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                                <div class="kpi-card" style="background-color: #f8fafc;">
+                                    <h3 style="font-size: 15px; color: #ea580c; font-weight: 800; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">TERCEIROS</h3>
+                                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin:0; padding:0; color: var(--text-main);">
+                                        <li style="display: flex; justify-content: space-between; color: #ea580c;"><span>Total</span> <strong>18</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>Programadores</span> <strong>15</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>Analistas</span> <strong>3</strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2 class="gi-group-title" style="color: #065f46;"><i class="ph-bold ph-users-three"></i> ESTRUTURA CIINTEC (4 profissionais)</h2>
+
+                            <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 0;">
+                                <div class="kpi-card" style="background-color: #f8fafc;">
+                                    <h3 style="font-size: 15px; color: var(--primary); font-weight: 800; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">EQUIPE</h3>
+                                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin:0; padding:0; color: var(--text-main);">
+                                        <li style="display: flex; justify-content: space-between;"><span>TÉCNICOS</span> <strong>2</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>ANALISTA NEGÓCIO</span> <strong>1</strong></li>
+                                        <li style="display: flex; justify-content: space-between;"><span>ANALISTA GESTÃO ADM.</span> <strong>1</strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+			<section id="pane-acompanhamento-prefeitura" class="view-pane">
+				<div style="background-color: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; padding: 12px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; margin-bottom: 20px;">
+					Reflete a aba "Resumo Reuniao Prefeito" da planilha — um quadro de ata de reunião em formato livre, não uma lista de projetos. O layout abaixo é uma recriação visual do conteúdo dessa aba.
+				</div>
+				<div id="prefeitura-board-content">
+					<div style="text-align:center; padding:48px; color:var(--text-muted);">Sincronizando quadro de acompanhamento...</div>
+				</div>
+			</section>
+        </div>
+    </main>
+
+    <div id="detail-modal" class="modal-overlay">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
+            <div class="modal-header">
+                <h2 id="detail-modal-title">Detalhes Completos do Projeto</h2>
+                <button class="close-modal" onclick="closeModal()" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field"><span class="field-label">Ticket / Projeto</span><div id="m-ticket" class="field-value"></div></div>
+                <div class="modal-field"><span class="field-label">Secretaria</span><div id="m-secretaria" class="field-value"></div></div>
+                <div class="modal-field"><span class="field-label">Setor</span><div id="m-setor" class="field-value"></div></div>
+                <div class="modal-field"><span class="field-label">Status</span><div id="m-status" class="field-value"></div></div>
+                <div class="modal-field"><span class="field-label">Classificação</span><div id="m-classificacao" class="field-value"></div></div>
+                <div class="modal-field"><span class="field-label">Prioridade</span><div id="m-prioridade" class="field-value"></div></div>
+                <div class="modal-field"><span class="field-label">Importância</span><div id="m-importancia" class="field-value"></div></div>
+                <div class="modal-field modal-field-full"><span class="field-label">Risco</span><div id="m-risco" class="field-value"></div></div>
+                <div class="modal-field"><span class="field-label">Data de Início</span><div id="m-dtinicio" class="field-value"></div></div>
+                <div class="modal-field"><span class="field-label">Data de Fim</span><div id="m-dtfim" class="field-value"></div></div>
+                <div class="modal-field"><span class="field-label">Progresso Atual</span><div id="m-avanco-container" class="field-value"></div></div>
+                <div class="modal-field modal-field-full"><span class="field-label">Histórico de Andamento</span><div id="m-andamento" class="field-value" style="background-color: #f8fafc; font-weight: 500;"></div></div>
+                <div class="modal-field modal-field-full"><span class="field-label">Observações Internas</span><div id="m-observacao" class="field-value"></div></div>
+            </div>
+        </div>
+    </div>
+
+	<div id="list-modal" class="modal-overlay">
+		<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="list-modal-title" style="max-width: 700px;">
+			<div class="modal-header">
+				<h2 id="list-modal-title">Lista</h2>
+				<button class="close-modal" onclick="closeListModal()" aria-label="Fechar">&times;</button>
+			</div>
+			<div class="modal-body" style="display: block; padding: 20px;">
+				<div class="table-responsive" style="max-height: 60vh;">
+					<table>
+						<thead><tr><th class="col-ticket">Ticket</th><th class="col-sec">Secretaria</th><th>Detalhe</th><th id="list-modal-extra-header" style="display:none;">Ação</th><th class="col-acoes">Ações</th></tr></thead>
+						<tbody id="list-modal-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="rules-modal" class="modal-overlay">
+		<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="rules-modal-title" style="max-width: 600px;">
+			<div class="modal-header">
+				<h2 id="rules-modal-title">Regras dos Indicadores</h2>
+				<button class="close-modal" onclick="closeRulesModal()" aria-label="Fechar">&times;</button>
+			</div>
+			<div class="modal-body" style="display: block; padding: 24px;">
+				<p style="font-size: 14px; line-height: 1.7; color: var(--text-main);">
+					Os indicadores <strong>"Avanço para Entrega"</strong>, <strong>"Distribuição por Classificação"</strong>, <strong>"Matriz de Prioridades"</strong> e <strong>"Grau de Importância do Portfólio"</strong> desconsideram projetos com status <strong>SUSPENSO</strong>, <strong>AGUARDANDO CLIENTE</strong> ou <strong>AGUARDANDO PRESIDENTE</strong>.
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div id="image-modal" class="modal-overlay">
+		<div role="dialog" aria-modal="true" aria-label="Organograma Ampliado" style="position: relative; max-width: 95vw; max-height: 95vh; display: flex; align-items: center; justify-content: center; overflow: auto; background: transparent; padding: 10px;">
+			<button class="close-modal close-image-btn" onclick="closeImageModal()" aria-label="Fechar" style="position: absolute; top: -30px; right: 0; color: #ffffff; font-size: 32px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2001; cursor: pointer; border: none; background: transparent;">&times;</button>
+			<img src="https://lh3.googleusercontent.com/d/1O3V8juZ-00RfgnKc3VfQy3ywl90h7FHs"
+				 alt="Organograma Ampliado"
+				 style="max-width: 100%; max-height: 90vh; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); background: white;">
+		</div>
+	</div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/risk.js"></script>
+    <script src="js/data-fetch.js"></script>
+    <script src="js/render-tables.js"></script>
+    <script src="js/render-workload.js"></script>
+    <script src="js/render-secretaria.js"></script>
+    <script src="js/render-executive.js"></script>
+    <script src="js/render-prefeitura.js"></script>
+    <script src="js/render-charts.js"></script>
+    <script src="js/render-gestao-interna.js"></script>
+    <script src="js/ui-navigation.js"></script>
+    <script src="js/ui-modals.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
