@@ -138,9 +138,11 @@ function renderContratosAcompanhamento() {
         <tr class="${isExpiringThisYear ? 'row-contract-expiring' : ''}">
             <td class="col-contrato-forn" data-label="Fornecedor / Objeto">${escapeHtml(c.fornecedor)}</td>
             <td class="col-contrato-venc" data-label="Vencimento">${escapeHtml(c.vencimentoStr) || '-'}</td>
+            <td class="col-contrato-valor" data-label="Total Previsto (Ano)">${formatCurrencyBRL(c.totalPrevisto)}</td>
+            <td class="col-contrato-valor" data-label="Total Pago (Ano)">${formatCurrencyBRL(c.totalGasto)}</td>
             <td class="col-contrato-tipo" data-label="Tipo de Contratação">${escapeHtml(c.tipoContratacao)}</td>
         </tr>`;
-    }).join('') || '<tr><td colspan="3" style="text-align:center; padding:32px;">Nenhum contrato encontrado.</td></tr>';
+    }).join('') || '<tr><td colspan="5" style="text-align:center; padding:32px;">Nenhum contrato encontrado.</td></tr>';
 
     renderContratosSemPagamento();
 }
@@ -253,8 +255,7 @@ function renderContratosDesvioTable() {
             const desvioPerc = c.totalPrevisto > 0 ? (desvio / c.totalPrevisto * 100) : (c.totalGasto > 0 ? 100 : 0);
             return { ...c, desvio, desvioPerc };
         })
-        .sort((a, b) => Math.abs(b.desvio) - Math.abs(a.desvio))
-        .slice(0, 10);
+        .sort((a, b) => Math.abs(b.desvio) - Math.abs(a.desvio));
 
     tbody.innerHTML = comOrcamento.map(c => {
         const cls = c.desvio > 0 ? 'desvio-acima' : (c.desvio < 0 ? 'desvio-abaixo' : 'desvio-neutro');
