@@ -72,11 +72,19 @@ function parseContratosSheet(response) {
         if (normalizeString(observacao).includes(NAO_RENOVAR_MARKER)) return;
 
         const vencimentoStr = cellStr(idxVencimento);
-        const monthly = monthCols.map(mc => ({
-            mes: mc.mes,
-            previsto: parseBrazilianCurrency(cellValues[mc.idxPrevisto]),
-            gasto: parseBrazilianCurrency(cellValues[mc.idxGasto])
-        }));
+        const monthly = monthCols.map(mc => {
+            // "-" é o jeito que a planilha marca "sem gasto neste mês" (informado). Célula vazia
+            // ou só espaço em branco é diferente: significa que ninguém preencheu ainda — é essa
+            // lacuna que o quadro "sem pagamento informado" (abaixo) precisa distinguir.
+            const rawGasto = cellValues[mc.idxGasto];
+            const rawGastoStr = (rawGasto !== undefined && rawGasto !== null) ? rawGasto.toString().trim() : '';
+            return {
+                mes: mc.mes,
+                previsto: parseBrazilianCurrency(cellValues[mc.idxPrevisto]),
+                gasto: parseBrazilianCurrency(rawGasto),
+                gastoInformado: rawGastoStr.length > 0
+            };
+        });
 
         results.push({
             fornecedor,
@@ -133,6 +141,73 @@ function renderContratosAcompanhamento() {
             <td class="col-contrato-tipo" data-label="Tipo de Contratação">${escapeHtml(c.tipoContratacao)}</td>
         </tr>`;
     }).join('') || '<tr><td colspan="3" style="text-align:center; padding:32px;">Nenhum contrato encontrado.</td></tr>';
+
+    renderContratosSemPagamento();
+}
+
+// Contratos com previsto orçado num mês anterior ao atual (deste ano) cujo Gasto não foi
+// preenchido — distingue de "-" (que na planilha significa "sem gasto neste mês", já
+// informado) olhando o texto bruto da célula em parseContratosSheet (gastoInformado).
+function getContratosSemPagamento() {
+    const currentMonthIndex = new Date().getMonth(); // 0 = Janeiro
+
+    const contratosComGap = contractsList
+        .map(c => ({
+            contrato: c,
+            gaps: c.monthly
+                .map((m, idx) => ({ ...m, idx }))
+                .filter(m => m.idx < currentMonthIndex && m.previsto > 0 && !m.gastoInformado)
+        }))
+        .filter(x => x.gaps.length > 0);
+
+    const mesesComGap = [...new Set(contratosComGap.flatMap(x => x.gaps.map(g => g.idx)))].sort((a, b) => a - b);
+
+    return { contratosComGap, mesesComGap, currentMonthIndex };
+}
+
+function renderContratosSemPagamento() {
+    const container = document.getElementById('contratos-sem-pagamento-container');
+    if (!container) return;
+
+    const { contratosComGap, mesesComGap, currentMonthIndex } = getContratosSemPagamento();
+
+    const titleEl = document.getElementById('contratos-sem-pagamento-title');
+    if (titleEl) {
+        titleEl.innerText = currentMonthIndex === 0
+            ? 'Contratos sem Pagamento Informado'
+            : `Contratos sem Pagamento Informado (meses anteriores a ${MONTHS_BR[currentMonthIndex]})`;
+    }
+
+    if (currentMonthIndex === 0) {
+        container.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding: 4px 0 12px;">Ainda não há meses anteriores no ano para analisar.</div>';
+        return;
+    }
+
+    if (contratosComGap.length === 0) {
+        container.innerHTML = '<div style="color:var(--color-success); font-size:13px; font-weight:600; padding: 4px 0 12px;"><i class="ph-bold ph-check-circle"></i> Nenhum contrato com pagamento não informado nos meses anteriores.</div>';
+        return;
+    }
+
+    const theadMeses = mesesComGap.map(idx => `<th class="col-contrato-valor">${MONTHS_BR[idx]} (Previsto)</th><th class="col-contrato-valor">${MONTHS_BR[idx]} (Pago)</th>`).join('');
+
+    const rows = contratosComGap.map(({ contrato, gaps }) => {
+        const gapByIdx = new Map(gaps.map(g => [g.idx, g]));
+        const cells = mesesComGap.map(idx => {
+            const gap = gapByIdx.get(idx);
+            if (!gap) return `<td class="col-contrato-valor" data-label="Previsto ${MONTHS_BR[idx]}">-</td><td class="col-contrato-valor" data-label="Pago ${MONTHS_BR[idx]}">-</td>`;
+            return `<td class="col-contrato-valor" data-label="Previsto ${MONTHS_BR[idx]}">${formatCurrencyBRL(gap.previsto)}</td><td class="col-contrato-valor" data-label="Pago ${MONTHS_BR[idx]}"></td>`;
+        }).join('');
+        return `<tr><td class="col-contrato-forn" data-label="Fornecedor / Objeto">${escapeHtml(contrato.fornecedor)}</td>${cells}</tr>`;
+    }).join('');
+
+    container.innerHTML = `
+        <div class="table-responsive" style="max-height: 360px;">
+            <table>
+                <thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th>${theadMeses}</tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>
+    `;
 }
 
 // --- View "Indicadores Gestão" ----------------------------------------------------------
