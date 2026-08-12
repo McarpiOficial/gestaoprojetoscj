@@ -196,15 +196,22 @@ function renderContratosSemPagamento() {
 
     const rows = contratosComGap.map(({ contrato, gaps }) => {
         const gapByIdx = new Map(gaps.map(g => [g.idx, g]));
+        // "-" esmaecido = este mês não é lacuna para este contrato (já tinha pagamento
+        // lançado, ou não havia previsto). Valor em destaque = lacuna real, para não parecer
+        // que todo "-" na tabela é um problema de dado.
         const cells = mesesComGap.map(idx => {
             const gap = gapByIdx.get(idx);
-            if (!gap) return `<td class="col-contrato-valor" data-label="Previsto ${MONTHS_BR[idx]}">-</td><td class="col-contrato-valor" data-label="Pago ${MONTHS_BR[idx]}">-</td>`;
-            return `<td class="col-contrato-valor" data-label="Previsto ${MONTHS_BR[idx]}">${formatCurrencyBRL(gap.previsto)}</td><td class="col-contrato-valor" data-label="Pago ${MONTHS_BR[idx]}"></td>`;
+            if (!gap) return `<td class="col-contrato-valor" style="color:var(--text-muted);" data-label="Previsto ${MONTHS_BR[idx]}">-</td><td class="col-contrato-valor" style="color:var(--text-muted);" data-label="Pago ${MONTHS_BR[idx]}">-</td>`;
+            return `<td class="col-contrato-valor" style="color:var(--color-warning-dark); font-weight:var(--fw-bold);" data-label="Previsto ${MONTHS_BR[idx]}">${formatCurrencyBRL(gap.previsto)}</td><td class="col-contrato-valor" data-label="Pago ${MONTHS_BR[idx]}"></td>`;
         }).join('');
         return `<tr><td class="col-contrato-forn" data-label="Fornecedor / Objeto">${escapeHtml(contrato.fornecedor)}</td>${cells}</tr>`;
     }).join('');
 
     container.innerHTML = `
+        <div style="font-size: var(--fs-xs); color: var(--text-muted); margin-bottom: 8px;">
+            <span style="color: var(--color-warning-dark); font-weight: var(--fw-bold);">Valor em destaque</span> = lacuna real (tinha previsto, sem pagamento lançado).
+            <span style="color: var(--text-muted);">"-" esmaecido</span> = este mês não é lacuna para este contrato.
+        </div>
         <div class="table-responsive table-gridlines" style="max-height: 360px;">
             <table>
                 <thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th>${theadMeses}</tr></thead>
