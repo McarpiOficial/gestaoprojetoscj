@@ -73,16 +73,17 @@ function parseContratosSheet(response) {
 
         const vencimentoStr = cellStr(idxVencimento);
         const monthly = monthCols.map(mc => {
-            // "-" é o jeito que a planilha marca "sem gasto neste mês" (informado). Célula vazia
-            // ou só espaço em branco é diferente: significa que ninguém preencheu ainda — é essa
-            // lacuna que o quadro "sem pagamento informado" (abaixo) precisa distinguir.
+            // Só conta como "informado" quando há um valor numérico de fato lançado. Célula vazia
+            // e célula com "-" (o jeito que a planilha marca ausência de valor) são igualmente
+            // "sem pagamento informado" para o quadro abaixo.
             const rawGasto = cellValues[mc.idxGasto];
             const rawGastoStr = (rawGasto !== undefined && rawGasto !== null) ? rawGasto.toString().trim() : '';
+            const isPlaceholder = rawGastoStr === '' || /^[-–—]+$/.test(rawGastoStr);
             return {
                 mes: mc.mes,
                 previsto: parseBrazilianCurrency(cellValues[mc.idxPrevisto]),
                 gasto: parseBrazilianCurrency(rawGasto),
-                gastoInformado: rawGastoStr.length > 0
+                gastoInformado: !isPlaceholder
             };
         });
 
