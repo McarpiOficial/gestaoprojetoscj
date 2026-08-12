@@ -256,7 +256,7 @@ function renderContratosDesvioTable() {
             const desvioPerc = c.totalPrevisto > 0 ? (desvio / c.totalPrevisto * 100) : (c.totalGasto > 0 ? 100 : 0);
             return { ...c, desvio, desvioPerc };
         })
-        .sort((a, b) => Math.abs(b.desvio) - Math.abs(a.desvio));
+        .sort((a, b) => Math.abs(b.desvioPerc) - Math.abs(a.desvioPerc));
 
     tbody.innerHTML = comOrcamento.map(c => {
         const cls = c.desvio > 0 ? 'desvio-acima' : (c.desvio < 0 ? 'desvio-abaixo' : 'desvio-neutro');
