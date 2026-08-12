@@ -43,6 +43,10 @@ function parseContratosSheet(response) {
     const idxFornecedor = findCol('Fornecedor', 1);
     const idxVencimento = findCol('Vencimento Contrato', 3);
     const idxTipo = findCol('Compra Direta ou Licitação', 4);
+    const idxObservacao = findCol('Observação', 5);
+    // Contratos marcados como "não será renovado" na coluna Observação são ignorados em
+    // todas as views de Contratos (Acompanhamento e Indicadores Gestão).
+    const NAO_RENOVAR_MARKER = normalizeString('não será renovado');
 
     // Pares (Mês, Gasto) — localizados pelo nome do mês, com fallback posicional a partir da
     // coluna 6 (2 colunas por mês), caso o cabeçalho não seja reconhecido.
@@ -63,6 +67,9 @@ function parseContratosSheet(response) {
 
         const fornecedor = cellStr(idxFornecedor);
         if (!fornecedor || normalizeString(fornecedor) === 'fornecedor') return;
+
+        const observacao = cellStr(idxObservacao);
+        if (normalizeString(observacao).includes(NAO_RENOVAR_MARKER)) return;
 
         const vencimentoStr = cellStr(idxVencimento);
         const monthly = monthCols.map(mc => ({
