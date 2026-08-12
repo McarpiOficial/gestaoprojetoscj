@@ -214,6 +214,13 @@
 .desvio-abaixo { background-color: var(--color-success-soft); color: var(--color-success); }
 .desvio-neutro { background-color: var(--gray-100); color: var(--gray-600); }
 
+/* Grade com divisórias verticais entre colunas, além das horizontais que toda tabela já tem —
+   usado no quadro "Contratos sem Pagamento Informado", que tem muitas colunas de mês lado a
+   lado e se beneficia de células mais compactas para caber mais meses sem rolar tanto. */
+.table-gridlines table { table-layout: auto; }
+.table-gridlines th, .table-gridlines td { padding: var(--space-2) var(--space-3); font-size: var(--fs-sm); white-space: nowrap; border-right: 1px solid var(--border); }
+.table-gridlines th:last-child, .table-gridlines td:last-child { border-right: none; }
+
 /* Tooltip rico (tabela) do badge de Risco — elemento único flutuante, ver risk.js */
 .risk-tooltip-float {
     display: none;

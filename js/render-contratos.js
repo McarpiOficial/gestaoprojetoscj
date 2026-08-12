@@ -191,7 +191,8 @@ function renderContratosSemPagamento() {
         return;
     }
 
-    const theadMeses = mesesComGap.map(idx => `<th class="col-contrato-valor">${MONTHS_BR[idx]} (Previsto)</th><th class="col-contrato-valor">${MONTHS_BR[idx]} (Pago)</th>`).join('');
+    const mesAbrev = idx => MONTHS_BR[idx].slice(0, 3);
+    const theadMeses = mesesComGap.map(idx => `<th class="col-contrato-valor">${mesAbrev(idx)} Prev</th><th class="col-contrato-valor">${mesAbrev(idx)} Pag</th>`).join('');
 
     const rows = contratosComGap.map(({ contrato, gaps }) => {
         const gapByIdx = new Map(gaps.map(g => [g.idx, g]));
@@ -204,7 +205,7 @@ function renderContratosSemPagamento() {
     }).join('');
 
     container.innerHTML = `
-        <div class="table-responsive" style="max-height: 360px;">
+        <div class="table-responsive table-gridlines" style="max-height: 360px;">
             <table>
                 <thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th>${theadMeses}</tr></thead>
                 <tbody>${rows}</tbody>
