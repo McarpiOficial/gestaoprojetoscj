@@ -257,11 +257,13 @@ function renderContratosDesvioTable() {
     const tbody = document.getElementById('contratos-desvio-body');
     if (!tbody) return;
 
+    // Contratos sem nenhum pagamento no ano (totalGasto = 0) ficam de fora daqui — não é
+    // "desvio", é pagamento que ainda nem começou (ver renderContratosPagamentosFuturos).
     const comOrcamento = contractsList
-        .filter(c => c.totalPrevisto > 0 || c.totalGasto > 0)
+        .filter(c => c.totalPrevisto > 0 && c.totalGasto > 0)
         .map(c => {
             const desvio = c.totalGasto - c.totalPrevisto;
-            const desvioPerc = c.totalPrevisto > 0 ? (desvio / c.totalPrevisto * 100) : (c.totalGasto > 0 ? 100 : 0);
+            const desvioPerc = desvio / c.totalPrevisto * 100;
             return { ...c, desvio, desvioPerc };
         })
         .sort((a, b) => Math.abs(b.desvioPerc) - Math.abs(a.desvioPerc));
@@ -277,6 +279,30 @@ function renderContratosDesvioTable() {
             <td style="text-align:center;" data-label="Desvio"><span class="badge-desvio ${cls}">${sinal}${formatCurrencyBRL(c.desvio)} (${sinal}${c.desvioPerc.toFixed(0)}%)</span></td>
         </tr>`;
     }).join('') || '<tr><td colspan="4" style="text-align:center; padding:24px;">Sem dados de orçamento disponíveis.</td></tr>';
+}
+
+// Contratos orçados para o ano mas sem nenhum pagamento lançado ainda — pagamentos futuros,
+// não desvio orçamentário (ainda não dá pra comparar previsto x gasto quando o gasto é 0).
+function renderContratosPagamentosFuturos() {
+    const tbody = document.getElementById('contratos-futuros-body');
+    if (!tbody) return;
+
+    const futuros = contractsList
+        .filter(c => c.totalPrevisto > 0 && c.totalGasto === 0)
+        .sort((a, b) => {
+            if (!a.vencimentoDate && !b.vencimentoDate) return 0;
+            if (!a.vencimentoDate) return 1;
+            if (!b.vencimentoDate) return -1;
+            return a.vencimentoDate - b.vencimentoDate;
+        });
+
+    tbody.innerHTML = futuros.map(c => `
+        <tr>
+            <td class="col-contrato-forn" data-label="Fornecedor / Objeto">${escapeHtml(c.fornecedor)}</td>
+            <td class="col-contrato-venc" data-label="Vencimento">${escapeHtml(c.vencimentoStr) || '-'}</td>
+            <td class="col-contrato-valor" data-label="Total Previsto (Ano)">${formatCurrencyBRL(c.totalPrevisto)}</td>
+        </tr>
+    `).join('') || '<tr><td colspan="3" style="text-align:center; padding:24px;">Nenhum contrato com pagamento futuro pendente.</td></tr>';
 }
 
 function buildContratosOrcamentoChart() {
@@ -330,5 +356,6 @@ function renderContratosIndicadores() {
 
     renderContratosVencimento5Meses();
     renderContratosDesvioTable();
+    renderContratosPagamentosFuturos();
     buildContratosOrcamentoChart();
 }
