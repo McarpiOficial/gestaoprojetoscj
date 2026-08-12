@@ -26,19 +26,41 @@
         </button>
         <div class="sidebar-brand">CIJUN<span>Gestão de Projetos</span></div>
         <ul class="sidebar-menu">
-            <li><button type="button" class="menu-item active" onclick="switchView('ativos', this)"><i class="ph-bold ph-play-circle"></i><span class="menu-label">Projetos Ativos DT</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('encerrados', this)"><i class="ph-bold ph-check-circle"></i><span class="menu-label">Projetos Encerr. DT</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('ciintec', this)"><i class="ph-bold ph-flask"></i><span class="menu-label">CIINTEC</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('parados', this)"><i class="ph-bold ph-pause-circle"></i><span class="menu-label">Projetos Parados DT</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('backlog', this)"><i class="ph-bold ph-stack"></i><span class="menu-label">Backlogs DT</span></button></li>
-			<li><button type="button" class="menu-item" onclick="switchView('suspensos', this)"><i class="ph-bold ph-prohibit"></i><span class="menu-label">Projetos Suspensos DT</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('carga-analista', this)"><i class="ph-bold ph-users-three"></i><span class="menu-label">Carga por Analista</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('secretaria', this)"><i class="ph-bold ph-buildings"></i><span class="menu-label">Visão por Secretaria</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('resumo-executivo', this)"><i class="ph-bold ph-presentation-chart"></i><span class="menu-label">Resumo Executivo</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('indicadores', this)"><i class="ph-bold ph-chart-bar"></i><span class="menu-label">Indicadores & Gráficos</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('gestao-interna', this)"><i class="ph-bold ph-briefcase"></i><span class="menu-label">Gestão Interna</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('estrutura-ferramentas', this)"><i class="ph-bold ph-wrench"></i><span class="menu-label">Estrutura Ferramentas</span></button></li>
-            <li><button type="button" class="menu-item" onclick="switchView('acompanhamento-prefeitura', this)"><i class="ph-bold ph-crown-simple"></i><span class="menu-label">Acompanh. Prefeitura</span></button></li>
+            <li class="menu-group open" data-group="projetos">
+                <button type="button" class="menu-group-toggle" onclick="toggleMenuGroup(this)" aria-expanded="true"><i class="ph-bold ph-folders"></i><span class="menu-label">Projetos</span><i class="ph-bold ph-caret-down menu-group-caret"></i></button>
+                <ul class="menu-subgroup">
+                    <li><button type="button" class="menu-item active" onclick="switchView('ativos', this)"><i class="ph-bold ph-play-circle"></i><span class="menu-label">Projetos Ativos DT</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('encerrados', this)"><i class="ph-bold ph-check-circle"></i><span class="menu-label">Projetos Encerr. DT</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('ciintec', this)"><i class="ph-bold ph-flask"></i><span class="menu-label">Projetos CIINTEC</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('parados', this)"><i class="ph-bold ph-pause-circle"></i><span class="menu-label">Projetos Parados DT</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('backlog', this)"><i class="ph-bold ph-stack"></i><span class="menu-label">Backlogs DT</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('suspensos', this)"><i class="ph-bold ph-prohibit"></i><span class="menu-label">Projetos Suspensos DT</span></button></li>
+                </ul>
+            </li>
+            <li class="menu-group" data-group="gerencia">
+                <button type="button" class="menu-group-toggle" onclick="toggleMenuGroup(this)" aria-expanded="false"><i class="ph-bold ph-gauge"></i><span class="menu-label">Gerência</span><i class="ph-bold ph-caret-down menu-group-caret"></i></button>
+                <ul class="menu-subgroup">
+                    <li><button type="button" class="menu-item" onclick="switchView('indicadores', this)"><i class="ph-bold ph-chart-bar"></i><span class="menu-label">Indicadores</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('estrutura-ferramentas', this)"><i class="ph-bold ph-wrench"></i><span class="menu-label">Estrutura Ferramentas</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('acompanhamento-prefeitura', this)"><i class="ph-bold ph-crown-simple"></i><span class="menu-label">Acompanh. Prefeitura</span></button></li>
+                </ul>
+            </li>
+            <li class="menu-group" data-group="gestao">
+                <button type="button" class="menu-group-toggle" onclick="toggleMenuGroup(this)" aria-expanded="false"><i class="ph-bold ph-chart-pie-slice"></i><span class="menu-label">Gestão</span><i class="ph-bold ph-caret-down menu-group-caret"></i></button>
+                <ul class="menu-subgroup">
+                    <li><button type="button" class="menu-item" onclick="switchView('carga-analista', this)"><i class="ph-bold ph-users-three"></i><span class="menu-label">Carga por Analista</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('secretaria', this)"><i class="ph-bold ph-buildings"></i><span class="menu-label">Visão por Secretaria</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('resumo-executivo', this)"><i class="ph-bold ph-presentation-chart"></i><span class="menu-label">Resumo Executivo</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('gestao-interna', this)"><i class="ph-bold ph-briefcase"></i><span class="menu-label">Gestão Interna</span></button></li>
+                </ul>
+            </li>
+            <li class="menu-group" data-group="contratos">
+                <button type="button" class="menu-group-toggle" onclick="toggleMenuGroup(this)" aria-expanded="false"><i class="ph-bold ph-file-text"></i><span class="menu-label">Contratos</span><i class="ph-bold ph-caret-down menu-group-caret"></i></button>
+                <ul class="menu-subgroup">
+                    <li><button type="button" class="menu-item" onclick="switchView('contratos-acompanhamento', this)"><i class="ph-bold ph-list-checks"></i><span class="menu-label">Acompanhamento</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('contratos-indicadores', this)"><i class="ph-bold ph-wallet"></i><span class="menu-label">Indicadores Gestão</span></button></li>
+                </ul>
+            </li>
         </ul>
     </aside>
     <div id="sidebar-backdrop" onclick="closeSidebar()"></div>
@@ -639,6 +661,67 @@
 					<div style="text-align:center; padding:48px; color:var(--text-muted);">Sincronizando quadro de acompanhamento...</div>
 				</div>
 			</section>
+
+			<section id="pane-contratos-acompanhamento" class="view-pane">
+				<div class="table-toolbar" style="justify-content: space-between; flex-wrap: wrap; row-gap: 12px;">
+					<div style="display:flex; align-items:center; gap:8px; flex: 1; min-width: 220px;">
+						<i class="ph-bold ph-magnifying-glass" style="color: var(--text-muted);"></i>
+						<input type="text" id="input-busca-contratos" class="select-sort" style="flex:1; cursor:text; background-color:#ffffff;" placeholder="Buscar por fornecedor/objeto..." oninput="renderContratosAcompanhamento()">
+					</div>
+					<div style="display:flex; align-items:center; gap:8px;">
+						<label for="select-sort-contratos">Ordenar por Vencimento:</label>
+						<select id="select-sort-contratos" class="select-sort" onchange="renderContratosAcompanhamento()">
+							<option value="asc">Mais próximo primeiro</option>
+							<option value="desc">Mais distante primeiro</option>
+						</select>
+					</div>
+					<span style="font-size: 12px; color: var(--color-danger); font-weight: 600; white-space: nowrap;"><i class="ph-bold ph-warning-circle"></i> Em vermelho: vencimento em <span id="contratos-ano-atual"></span></span>
+				</div>
+				<div class="table-responsive">
+					<table>
+						<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-venc">Vencimento</th><th class="col-contrato-tipo">Tipo de Contratação</th></tr></thead>
+						<tbody id="contratos-acompanhamento-body"></tbody>
+					</table>
+				</div>
+			</section>
+
+			<section id="pane-contratos-indicadores" class="view-pane">
+				<div class="kpi-grid">
+					<div class="kpi-card"><h3>Contratos a Vencer no Ano</h3><p id="contratos-count-a-vencer" style="color: var(--color-danger);">0</p></div>
+					<div class="kpi-card"><h3>Contratos Ativos</h3><p id="contratos-count-ativos">0</p></div>
+					<div class="kpi-card"><h3>Total Previsto (Ano)</h3><p id="contratos-total-previsto" style="font-size: var(--fs-3xl); color: var(--gray-600);">R$ 0</p></div>
+					<div class="kpi-card"><h3>Total Gasto (Ano)</h3><p id="contratos-total-gasto" style="font-size: var(--fs-3xl); color: var(--color-primary);">R$ 0</p></div>
+					<div class="kpi-card"><h3>% Executado do Orçamento</h3><p id="contratos-perc-executado" style="color: var(--color-warning-dark);">0%</p></div>
+					<div class="kpi-card"><h3>Saldo Disponível (Previsto − Gasto)</h3><p id="contratos-saldo" style="font-size: var(--fs-3xl); color: var(--color-success);">R$ 0</p></div>
+				</div>
+
+				<div class="dashboard-grid">
+					<div class="chart-card" style="grid-column: 1 / -1;">
+						<div class="chart-title" style="margin-bottom:16px;">Previsto × Gasto por Mês (Ano Corrente)</div>
+						<div class="chart-container-box"><canvas id="chartContratosOrcamento"></canvas></div>
+					</div>
+
+					<div class="chart-card" style="min-height: auto; grid-column: 1 / -1;">
+						<div class="chart-title" style="margin-bottom: 16px;">Contratos com Vencimento nos Próximos 5 Meses</div>
+						<div class="table-responsive" style="max-height: 360px;">
+							<table>
+								<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-venc">Vencimento</th><th class="col-contrato-tipo">Tipo de Contratação</th></tr></thead>
+								<tbody id="contratos-5meses-body"></tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="chart-card" style="min-height: auto; grid-column: 1 / -1;">
+						<div class="chart-title" style="margin-bottom: 16px;" title="Maiores diferenças entre o que foi orçado (Total Previsto) e o efetivamente gasto (Total Gasto) — útil para ajustar o orçamento do próximo ano.">Maiores Desvios Orçamentários (Previsto × Gasto) ⓘ</div>
+						<div class="table-responsive" style="max-height: 360px;">
+							<table>
+								<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-valor">Total Previsto</th><th class="col-contrato-valor">Total Gasto</th><th style="text-align:center;">Desvio</th></tr></thead>
+								<tbody id="contratos-desvio-body"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</section>
         </div>
     </main>
 
@@ -716,6 +799,7 @@
     <script src="js/render-secretaria.js"></script>
     <script src="js/render-executive.js"></script>
     <script src="js/render-prefeitura.js"></script>
+    <script src="js/render-contratos.js"></script>
     <script src="js/render-charts.js"></script>
     <script src="js/render-gestao-interna.js"></script>
     <script src="js/ui-navigation.js"></script>

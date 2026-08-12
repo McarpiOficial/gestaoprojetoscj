@@ -43,6 +43,77 @@
 
     .menu-item:hover .menu-label { opacity: 1; }
 
+    /* Grupos do menu no rail do tablet: mesmo tratamento de flyout do modo desktop recolhido
+       (ver base.css, @media min-width:1200px .sidebar.collapsed) — sem espaço para expandir
+       o subgrupo inline num rail de 72px. */
+    .menu-group { position: relative; }
+
+    .menu-group-toggle {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2px;
+        padding: var(--space-3) var(--space-1);
+    }
+
+    .menu-group-toggle i:first-child { font-size: var(--fs-2xl); }
+    .menu-group-caret { display: none; }
+
+    .menu-group-toggle .menu-label {
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: var(--space-2);
+        background: var(--gray-900);
+        color: #ffffff;
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-sm);
+        font-size: var(--fs-base);
+        font-weight: var(--fw-medium);
+        text-transform: none;
+        letter-spacing: normal;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--transition-fast);
+        z-index: 50;
+        box-shadow: var(--shadow-md);
+    }
+
+    .menu-group-toggle:hover .menu-label { opacity: 1; }
+
+    .menu-subgroup {
+        position: absolute;
+        left: 100%;
+        top: 0;
+        margin-left: var(--space-2);
+        background: var(--gray-900);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        padding: var(--space-2);
+        min-width: 220px;
+        max-height: none;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 60;
+        transition: opacity var(--transition-fast);
+    }
+
+    .menu-group.open .menu-subgroup { opacity: 1; pointer-events: auto; }
+
+    .menu-subgroup .menu-item { flex-direction: row; justify-content: flex-start; padding: var(--space-2) var(--space-3); }
+    .menu-subgroup .menu-item .menu-label {
+        position: static;
+        opacity: 1;
+        pointer-events: auto;
+        background: none;
+        padding: 0;
+        box-shadow: none;
+        transform: none;
+        color: inherit;
+    }
+
     /* Cabeçalho: permite que os controles quebrem para a linha de baixo em
        vez de espremer o título em várias linhas de texto. */
     .top-header { flex-wrap: wrap; row-gap: var(--space-3); }

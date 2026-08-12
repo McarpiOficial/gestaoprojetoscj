@@ -51,6 +51,23 @@ function parseAndamentoTimeline(text) {
     return entries;
 }
 
+// Converte um número em formato monetário BR ("260.000,00" ou "-") para float. Usado na
+// planilha de Contratos, onde previsto/gasto de cada mês vem como texto formatado (ou
+// já como número puro quando a célula não tem formatação de moeda no gviz).
+function parseBrazilianCurrency(val) {
+    if (val === undefined || val === null || val === '') return 0;
+    if (typeof val === 'number') return val;
+    const str = val.toString().trim();
+    if (!str || str === '-' || str === '—') return 0;
+    const cleaned = str.replace(/\./g, '').replace(',', '.').replace(/[^\d.\-]/g, '');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+}
+
+function formatCurrencyBRL(num) {
+    return (num || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+}
+
 function extractDeliveredMonthYear(andamentoText) {
     if (!andamentoText) return '-';
     const dateRegex = /(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/;

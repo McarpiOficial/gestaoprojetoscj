@@ -7,6 +7,13 @@ const SPREADSHEET_ID = "1PXqVV1taHoanBwtE8IfqAg2ApkDJBmZyz7Wi8F3pinM";
 // lida separadamente da cadeia principal de projetos (ver js/render-prefeitura.js).
 const PREFEITURA_SHEET_NAME = "Resumo Reuniao Prefeito";
 
+// Planilha de Contratos — arquivo separado do portfólio de projetos, lida independentemente
+// da cadeia principal (ver js/render-contratos.js). Só a aba "Planejado2026" é usada.
+const CONTRATOS_SPREADSHEET_ID = "1qp4y5wHSpQosfdkHg5xOWILmePPIQ2TnzlHHsNjhxgU";
+const CONTRATOS_SHEET_NAME = "Planejado2026";
+// Nº de meses à frente considerados na grid "vencimento em 5 meses" do card de Indicadores Gestão.
+const CONTRATOS_VENCIMENTO_JANELA_MESES = 5;
+
 // Classes de css/components.css usadas por getClassificationBadge (js/render-tables.js).
 const CLASSIFICATION_CLASSES = {
     'INICIACAO': 'classification-iniciacao',

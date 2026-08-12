@@ -56,3 +56,9 @@ tr:hover td { background-color: var(--gray-50); }
 .col-risco { width: 8%; text-align: center; }
 .col-aging { width: 12%; text-align: center; white-space: nowrap; }
 .col-acoes { width: 5%; text-align: center; }
+
+/* Contratos (aba Planejado2026) */
+.col-contrato-forn { width: 55%; }
+.col-contrato-venc { width: 15%; text-align: center; white-space: nowrap; }
+.col-contrato-tipo { width: 20%; text-align: center; }
+.col-contrato-valor { width: 15%; text-align: right; white-space: nowrap; }

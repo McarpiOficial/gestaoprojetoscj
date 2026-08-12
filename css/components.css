@@ -203,6 +203,17 @@
 .aging-warning { background-color: var(--color-warning-soft); color: var(--color-warning-dark); }
 .aging-critical { background-color: var(--color-danger-soft); color: var(--color-danger); }
 
+/* Contratos (aba Planejado2026): linha destacada quando o vencimento cai neste ano, e badges
+   de desvio orçamentário (Total Gasto vs Total Previsto) usados no card de Indicadores Gestão. */
+.table-responsive tr.row-contract-expiring td { background-color: var(--color-danger-light); }
+.table-responsive tr.row-contract-expiring:hover td { background-color: var(--color-danger-soft); }
+.table-responsive tr.row-contract-expiring .col-contrato-forn { color: var(--color-danger); font-weight: var(--fw-semibold); }
+
+.badge-desvio { display: inline-block; padding: 4px 10px; border-radius: var(--radius-sm); font-size: var(--fs-sm); font-weight: var(--fw-bold); white-space: nowrap; }
+.desvio-acima { background-color: var(--color-danger-soft); color: var(--color-danger); }
+.desvio-abaixo { background-color: var(--color-success-soft); color: var(--color-success); }
+.desvio-neutro { background-color: var(--gray-100); color: var(--gray-600); }
+
 /* Tooltip rico (tabela) do badge de Risco — elemento único flutuante, ver risk.js */
 .risk-tooltip-float {
     display: none;

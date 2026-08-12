@@ -74,9 +74,43 @@ function applyStoredHeaderActionsPreference() {
 
 window.addEventListener('DOMContentLoaded', applyStoredHeaderActionsPreference);
 
+// Menu em 2 níveis (grupo/subgrupo) — accordion: só um grupo fica aberto por vez, para o menu
+// não ficar extenso com tantas opções. Preferência (qual grupo ficou aberto) persiste no
+// navegador; switchView() abaixo também abre automaticamente o grupo do item selecionado
+// (clique direto ou destaque vindo da busca em js/search.js).
+const MENU_OPEN_GROUP_KEY = 'cijun-menu-open-group';
+
+function setOpenMenuGroup(groupId, persist = true) {
+    document.querySelectorAll('.sidebar-menu .menu-group').forEach(group => {
+        const isTarget = group.dataset.group === groupId;
+        group.classList.toggle('open', isTarget);
+        const toggleBtn = group.querySelector('.menu-group-toggle');
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', isTarget ? 'true' : 'false');
+    });
+    if (persist) localStorage.setItem(MENU_OPEN_GROUP_KEY, groupId || '');
+}
+
+function toggleMenuGroup(btn) {
+    const group = btn.closest('.menu-group');
+    if (!group) return;
+    const isOpen = group.classList.contains('open');
+    setOpenMenuGroup(isOpen ? null : group.dataset.group);
+}
+
+function applyStoredMenuGroupPreference() {
+    const stored = localStorage.getItem(MENU_OPEN_GROUP_KEY);
+    setOpenMenuGroup(stored === null ? 'projetos' : stored, false);
+}
+
+window.addEventListener('DOMContentLoaded', applyStoredMenuGroupPreference);
+
 function switchView(viewName, element) {
     document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
     element.classList.add('active');
+
+    const group = element.closest ? element.closest('.menu-group') : null;
+    if (group && group.dataset.group) setOpenMenuGroup(group.dataset.group);
+
     const titles = {
         'ativos': 'Projetos Ativos DT',
         'ciintec': 'Projetos CIINTEC',
@@ -90,7 +124,9 @@ function switchView(viewName, element) {
         'indicadores': 'Painel de Indicadores Executivos',
         'gestao-interna': 'Gestão Interna',
         'estrutura-ferramentas': 'Estrutura Ferramentas',
-        'acompanhamento-prefeitura': 'Acompanhamento Prefeitura'
+        'acompanhamento-prefeitura': 'Acompanhamento Prefeitura',
+        'contratos-acompanhamento': 'Contratos - Acompanhamento',
+        'contratos-indicadores': 'Contratos - Indicadores Gestão'
     };
     document.getElementById('view-title').innerText = titles[viewName];
     document.querySelectorAll('.view-pane').forEach(pane => pane.classList.remove('active'));
@@ -98,6 +134,10 @@ function switchView(viewName, element) {
 
     if (viewName === 'indicadores') {
         buildAllCharts();
+    }
+
+    if (viewName === 'contratos-indicadores') {
+        renderContratosIndicadores();
     }
 
     if (window.innerWidth <= 767) closeSidebar();

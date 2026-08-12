@@ -26,3 +26,7 @@ let currentSearchIndex = 0;
 let lastSearchTerm = "";
 
 let activeSorts = { ativos: 'none', parados: 'none', backlog: 'none', suspensos: 'none', encerrados: 'none', ciintec: 'none' };
+
+// Contratos (aba Planejado2026) — planilha separada do portfólio de projetos.
+let contractsList = [];
+let chartContratosOrcamentoInstance = null;
