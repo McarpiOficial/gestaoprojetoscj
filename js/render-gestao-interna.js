@@ -37,24 +37,48 @@ function renderGestaoInterna(groupedData) {
 
         const iconClass = getIconForGroup(agrupamento);
 
+        // Descrição pode usar "Subgrupo | Item" (ex.: "Resumo Executivo | Janeiro") para agrupar
+        // visualmente vários documentos dentro do mesmo agrupamento, sem precisar de 3º nível
+        // na planilha (que só tem Agrupamento/Descrição/Link).
+        const mainItems = [];
+        const subgroups = new Map();
+        items.forEach(item => {
+            const sepIdx = item.descricao.indexOf(' | ');
+            if (sepIdx === -1) {
+                mainItems.push(item);
+            } else {
+                const subName = item.descricao.slice(0, sepIdx).trim();
+                const itemName = item.descricao.slice(sepIdx + 3).trim();
+                if (!subgroups.has(subName)) subgroups.set(subName, []);
+                subgroups.get(subName).push({ descricao: itemName, link: item.link });
+            }
+        });
+
+        const renderButtons = (list) => list.map(item => {
+            const hrefStr = item.link ? `href="${escapeHtml(item.link)}" target="_blank"` : `href="#" onclick="return false;"`;
+            return `<a ${hrefStr} class="gi-btn">${escapeHtml(item.descricao)}</a>`;
+        }).join('');
+
         html += `
             <div class="gi-group" style="${styleVars}">
                 <h2 class="gi-group-title">
                     <i class="ph-bold ${iconClass}"></i>
                     ${escapeHtml(agrupamento)}
                 </h2>
-                <div class="gi-buttons-grid">
         `;
 
-        items.forEach(item => {
-            const hrefStr = item.link ? `href="${escapeHtml(item.link)}" target="_blank"` : `href="#" onclick="return false;"`;
-            html += `<a ${hrefStr} class="gi-btn">${escapeHtml(item.descricao)}</a>`;
-        });
+        if (mainItems.length) {
+            html += `<div class="gi-buttons-grid">${renderButtons(mainItems)}</div>`;
+        }
 
-        html += `
-                </div>
-            </div>
-        `;
+        for (const [subName, subItems] of subgroups) {
+            html += `
+                <h3 class="gi-subgroup-title">${escapeHtml(subName)}</h3>
+                <div class="gi-buttons-grid">${renderButtons(subItems)}</div>
+            `;
+        }
+
+        html += `</div>`;
         colorIndex++;
     }
 

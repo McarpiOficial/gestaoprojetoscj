@@ -390,6 +390,16 @@
     gap: var(--space-4);
 }
 
+.gi-buttons-grid + .gi-subgroup-title { margin-top: var(--space-6); }
+
+.gi-subgroup-title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    color: var(--group-text);
+    margin-bottom: var(--space-3);
+    opacity: 0.85;
+}
+
 .gi-btn {
     display: flex;
     align-items: center;
