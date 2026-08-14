@@ -44,14 +44,15 @@ function parseContratosSheet(response) {
     const idxVencimento = findCol('Vencimento Contrato', 3);
     const idxTipo = findCol('Compra Direta ou Licitação', 4);
     const idxObservacao = findCol('Observação', 5);
+    const idxResponsavel = findCol('Responsavel', 6);
     // Contratos marcados como "não será renovado" na coluna Observação são ignorados em
     // todas as views de Contratos (Acompanhamento e Indicadores Gestão).
     const NAO_RENOVAR_MARKER = normalizeString('não será renovado');
 
     // Pares (Mês, Gasto) — localizados pelo nome do mês, com fallback posicional a partir da
-    // coluna 6 (2 colunas por mês), caso o cabeçalho não seja reconhecido.
+    // coluna 7 (após Responsavel, 2 colunas por mês), caso o cabeçalho não seja reconhecido.
     const monthCols = MONTHS_BR.map((mes, i) => {
-        const idxMes = findCol(mes, 6 + i * 2);
+        const idxMes = findCol(mes, 7 + i * 2);
         return { mes, idxPrevisto: idxMes, idxGasto: idxMes + 1 };
     });
 
@@ -92,6 +93,7 @@ function parseContratosSheet(response) {
             vencimentoStr,
             vencimentoDate: parseBrazilianDate(vencimentoStr),
             tipoContratacao: cellStr(idxTipo) || '-',
+            responsavel: cellStr(idxResponsavel) || '-',
             monthly,
             totalPrevisto: monthly.reduce((acc, m) => acc + m.previsto, 0),
             totalGasto: monthly.reduce((acc, m) => acc + m.gasto, 0)
@@ -103,8 +105,25 @@ function parseContratosSheet(response) {
 
 function handleContratosResponse(response) {
     contractsList = parseContratosSheet(response);
+    populateContratosResponsavelFilter();
     renderContratosAcompanhamento();
     renderContratosIndicadores();
+}
+
+// Preenche o select de Responsável com os valores distintos encontrados na planilha, mantendo
+// a seleção atual quando ainda for válida após um "Atualizar Dados".
+function populateContratosResponsavelFilter() {
+    const select = document.getElementById('select-resp-contratos');
+    if (!select) return;
+
+    const current = select.value;
+    const responsaveis = [...new Set(contractsList.map(c => c.responsavel).filter(r => r && r !== '-'))]
+        .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+    select.innerHTML = '<option value="">Todos os Responsáveis</option>' +
+        responsaveis.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('');
+
+    if (responsaveis.includes(current)) select.value = current;
 }
 
 // --- View "Acompanhamento" -------------------------------------------------------------
@@ -121,10 +140,14 @@ function renderContratosAcompanhamento() {
     const term = searchInput ? normalizeString(searchInput.value) : '';
     const sortSelect = document.getElementById('select-sort-contratos');
     const dir = sortSelect ? sortSelect.value : 'asc';
+    const respSelect = document.getElementById('select-resp-contratos');
+    const respFilter = respSelect ? respSelect.value : '';
 
-    let items = term
-        ? contractsList.filter(c => normalizeString(c.fornecedor).includes(term))
-        : [...contractsList];
+    let items = contractsList.filter(c => {
+        if (term && !normalizeString(c.fornecedor).includes(term)) return false;
+        if (respFilter && c.responsavel !== respFilter) return false;
+        return true;
+    });
 
     items.sort((a, b) => {
         if (!a.vencimentoDate && !b.vencimentoDate) return 0;
@@ -142,8 +165,9 @@ function renderContratosAcompanhamento() {
             <td class="col-contrato-valor" data-label="Total Previsto (Ano)">${formatCurrencyBRL(c.totalPrevisto)}</td>
             <td class="col-contrato-valor" data-label="Total Pago (Ano)">${formatCurrencyBRL(c.totalGasto)}</td>
             <td class="col-contrato-tipo" data-label="Tipo de Contratação">${escapeHtml(c.tipoContratacao)}</td>
+            <td class="col-contrato-resp" data-label="Responsável">${escapeHtml(c.responsavel)}</td>
         </tr>`;
-    }).join('') || '<tr><td colspan="5" style="text-align:center; padding:32px;">Nenhum contrato encontrado.</td></tr>';
+    }).join('') || '<tr><td colspan="6" style="text-align:center; padding:32px;">Nenhum contrato encontrado.</td></tr>';
 
     renderContratosSemPagamento();
 }
@@ -249,8 +273,9 @@ function renderContratosVencimento5Meses() {
             <td class="col-contrato-forn" data-label="Fornecedor / Objeto">${escapeHtml(c.fornecedor)}</td>
             <td class="col-contrato-venc" data-label="Vencimento">${escapeHtml(c.vencimentoStr)}</td>
             <td class="col-contrato-tipo" data-label="Tipo de Contratação">${escapeHtml(c.tipoContratacao)}</td>
+            <td class="col-contrato-resp" data-label="Responsável">${escapeHtml(c.responsavel)}</td>
         </tr>
-    `).join('') || `<tr><td colspan="3" style="text-align:center; padding:24px;">Nenhum contrato com vencimento nos próximos ${CONTRATOS_VENCIMENTO_JANELA_MESES} meses.</td></tr>`;
+    `).join('') || `<tr><td colspan="4" style="text-align:center; padding:24px;">Nenhum contrato com vencimento nos próximos ${CONTRATOS_VENCIMENTO_JANELA_MESES} meses.</td></tr>`;
 }
 
 function renderContratosDesvioTable() {
@@ -277,8 +302,9 @@ function renderContratosDesvioTable() {
             <td class="col-contrato-valor" data-label="Total Previsto">${formatCurrencyBRL(c.totalPrevisto)}</td>
             <td class="col-contrato-valor" data-label="Total Gasto">${formatCurrencyBRL(c.totalGasto)}</td>
             <td style="text-align:center;" data-label="Desvio"><span class="badge-desvio ${cls}">${sinal}${formatCurrencyBRL(c.desvio)} (${sinal}${c.desvioPerc.toFixed(0)}%)</span></td>
+            <td class="col-contrato-resp" data-label="Responsável">${escapeHtml(c.responsavel)}</td>
         </tr>`;
-    }).join('') || '<tr><td colspan="4" style="text-align:center; padding:24px;">Sem dados de orçamento disponíveis.</td></tr>';
+    }).join('') || '<tr><td colspan="5" style="text-align:center; padding:24px;">Sem dados de orçamento disponíveis.</td></tr>';
 }
 
 // Contratos orçados para o ano mas sem nenhum pagamento lançado ainda — pagamentos futuros,
@@ -301,8 +327,9 @@ function renderContratosPagamentosFuturos() {
             <td class="col-contrato-forn" data-label="Fornecedor / Objeto">${escapeHtml(c.fornecedor)}</td>
             <td class="col-contrato-venc" data-label="Vencimento">${escapeHtml(c.vencimentoStr) || '-'}</td>
             <td class="col-contrato-valor" data-label="Total Previsto (Ano)">${formatCurrencyBRL(c.totalPrevisto)}</td>
+            <td class="col-contrato-resp" data-label="Responsável">${escapeHtml(c.responsavel)}</td>
         </tr>
-    `).join('') || '<tr><td colspan="3" style="text-align:center; padding:24px;">Nenhum contrato com pagamento futuro pendente.</td></tr>';
+    `).join('') || '<tr><td colspan="4" style="text-align:center; padding:24px;">Nenhum contrato com pagamento futuro pendente.</td></tr>';
 }
 
 function buildContratosOrcamentoChart() {

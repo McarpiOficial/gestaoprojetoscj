@@ -669,6 +669,12 @@
 						<input type="text" id="input-busca-contratos" class="select-sort" style="flex:1; cursor:text; background-color:#ffffff;" placeholder="Buscar por fornecedor/objeto..." oninput="renderContratosAcompanhamento()">
 					</div>
 					<div style="display:flex; align-items:center; gap:8px;">
+						<label for="select-resp-contratos">Responsável:</label>
+						<select id="select-resp-contratos" class="select-sort" onchange="renderContratosAcompanhamento()">
+							<option value="">Todos os Responsáveis</option>
+						</select>
+					</div>
+					<div style="display:flex; align-items:center; gap:8px;">
 						<label for="select-sort-contratos">Ordenar por Vencimento:</label>
 						<select id="select-sort-contratos" class="select-sort" onchange="renderContratosAcompanhamento()">
 							<option value="asc">Mais próximo primeiro</option>
@@ -679,7 +685,7 @@
 				</div>
 				<div class="table-responsive">
 					<table>
-						<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-venc">Vencimento</th><th class="col-contrato-valor">Total Previsto (Ano)</th><th class="col-contrato-valor">Total Pago (Ano)</th><th class="col-contrato-tipo">Tipo de Contratação</th></tr></thead>
+						<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-venc">Vencimento</th><th class="col-contrato-valor">Total Previsto (Ano)</th><th class="col-contrato-valor">Total Pago (Ano)</th><th class="col-contrato-tipo">Tipo de Contratação</th><th class="col-contrato-resp">Responsável</th></tr></thead>
 						<tbody id="contratos-acompanhamento-body"></tbody>
 					</table>
 				</div>
@@ -710,7 +716,7 @@
 						<div class="chart-title" style="margin-bottom: 16px;">Contratos com Vencimento nos Próximos 5 Meses</div>
 						<div class="table-responsive" style="max-height: 360px;">
 							<table>
-								<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-venc">Vencimento</th><th class="col-contrato-tipo">Tipo de Contratação</th></tr></thead>
+								<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-venc">Vencimento</th><th class="col-contrato-tipo">Tipo de Contratação</th><th class="col-contrato-resp">Responsável</th></tr></thead>
 								<tbody id="contratos-5meses-body"></tbody>
 							</table>
 						</div>
@@ -720,7 +726,7 @@
 						<div class="chart-title" style="margin-bottom: 16px;" title="Maiores diferenças entre o que foi orçado (Total Previsto) e o efetivamente gasto (Total Gasto) — útil para ajustar o orçamento do próximo ano.">Maiores Desvios Orçamentários (Previsto × Gasto) ⓘ</div>
 						<div class="table-responsive" style="max-height: 360px;">
 							<table>
-								<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-valor">Total Previsto</th><th class="col-contrato-valor">Total Gasto</th><th style="text-align:center;">Desvio</th></tr></thead>
+								<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-valor">Total Previsto</th><th class="col-contrato-valor">Total Gasto</th><th style="text-align:center;">Desvio</th><th class="col-contrato-resp">Responsável</th></tr></thead>
 								<tbody id="contratos-desvio-body"></tbody>
 						</table>
 					</div>
@@ -730,7 +736,7 @@
 					<div class="chart-title" style="margin-bottom: 16px;" title="Contratos com orçamento previsto para o ano mas sem nenhum pagamento lançado ainda — pagamento futuro, não desvio.">Contratos com Pagamento Futuro (ainda sem nenhum pagamento) ⓘ</div>
 					<div class="table-responsive" style="max-height: 360px;">
 						<table>
-							<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-venc">Vencimento</th><th class="col-contrato-valor">Total Previsto (Ano)</th></tr></thead>
+							<thead><tr><th class="col-contrato-forn">Fornecedor / Objeto</th><th class="col-contrato-venc">Vencimento</th><th class="col-contrato-valor">Total Previsto (Ano)</th><th class="col-contrato-resp">Responsável</th></tr></thead>
 							<tbody id="contratos-futuros-body"></tbody>
 							</table>
 						</div>
