@@ -704,6 +704,19 @@
 					<div class="kpi-card"><h3>Total Gasto (Ano)</h3><p id="contratos-total-gasto" style="font-size: var(--fs-3xl); color: var(--color-primary);">R$ 0</p></div>
 					<div class="kpi-card"><h3>% Executado do Orçamento</h3><p id="contratos-perc-executado" style="color: var(--color-warning-dark);">0%</p></div>
 					<div class="kpi-card"><h3>Saldo Disponível (Previsto − Gasto)</h3><p id="contratos-saldo" style="font-size: var(--fs-3xl); color: var(--color-success);">R$ 0</p></div>
+					<div class="kpi-card"><h3 id="contratos-total-previsto-mes-ant-title">Total Previsto (até o mês anterior)</h3><p id="contratos-total-previsto-mes-ant" style="font-size: var(--fs-3xl); color: var(--gray-600);">R$ 0</p></div>
+					<div class="kpi-card"><h3 id="contratos-total-gasto-mes-ant-title">Total Gasto (até o mês anterior)</h3><p id="contratos-total-gasto-mes-ant" style="font-size: var(--fs-3xl); color: var(--color-primary);">R$ 0</p></div>
+				</div>
+
+				<div class="chart-card" style="min-height: auto; grid-column: 1 / -1; margin-bottom: 20px;">
+					<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+						<div class="chart-title" id="contratos-acumulado-title" style="margin-bottom:0;">Previsto × Gasto Acumulado</div>
+						<div style="display:flex; align-items:center; gap:8px;">
+							<label for="select-mes-contratos-acumulado" style="font-size: var(--fs-xs); color: var(--text-muted); white-space:nowrap;">Ver acumulado até:</label>
+							<select id="select-mes-contratos-acumulado" class="select-sort" onchange="renderContratosAcumuladoMesChart()"></select>
+						</div>
+					</div>
+					<div class="chart-container-box" style="max-height: 280px;"><canvas id="chartContratosAcumuladoMes"></canvas></div>
 				</div>
 
 				<div class="dashboard-grid">

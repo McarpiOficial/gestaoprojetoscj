@@ -332,6 +332,100 @@ function renderContratosPagamentosFuturos() {
     `).join('') || '<tr><td colspan="4" style="text-align:center; padding:24px;">Nenhum contrato com pagamento futuro pendente.</td></tr>';
 }
 
+// Soma Previsto/Gasto de Janeiro até o índice de mês informado (inclusive), somando todos os contratos.
+function getContratosAcumuladoAteMes(mesIdx) {
+    return contractsList.reduce((acc, c) => {
+        const parcial = c.monthly.slice(0, mesIdx + 1).reduce((a, m) => ({ previsto: a.previsto + m.previsto, gasto: a.gasto + m.gasto }), { previsto: 0, gasto: 0 });
+        return { previsto: acc.previsto + parcial.previsto, gasto: acc.gasto + parcial.gasto };
+    }, { previsto: 0, gasto: 0 });
+}
+
+// Cards "Total Previsto/Gasto até o mês anterior" — sempre relativos ao mês anterior ao mês
+// corrente (calendário real), não ao mês selecionado no combo do gráfico logo abaixo.
+function renderContratosKpiMesAnterior() {
+    const valPrevistoEl = document.getElementById('contratos-total-previsto-mes-ant');
+    const valGastoEl = document.getElementById('contratos-total-gasto-mes-ant');
+    if (!valPrevistoEl || !valGastoEl) return;
+
+    const titlePrevistoEl = document.getElementById('contratos-total-previsto-mes-ant-title');
+    const titleGastoEl = document.getElementById('contratos-total-gasto-mes-ant-title');
+    const mesAnteriorIdx = new Date().getMonth() - 1; // -1 = janeiro, sem mês anterior no ano
+
+    if (mesAnteriorIdx < 0) {
+        if (titlePrevistoEl) titlePrevistoEl.innerText = 'Total Previsto (até o mês anterior)';
+        if (titleGastoEl) titleGastoEl.innerText = 'Total Gasto (até o mês anterior)';
+        valPrevistoEl.innerText = '—';
+        valGastoEl.innerText = '—';
+        return;
+    }
+
+    const mesNome = MONTHS_BR[mesAnteriorIdx];
+    if (titlePrevistoEl) titlePrevistoEl.innerText = `Total Previsto (até ${mesNome})`;
+    if (titleGastoEl) titleGastoEl.innerText = `Total Gasto (até ${mesNome})`;
+
+    const acumulado = getContratosAcumuladoAteMes(mesAnteriorIdx);
+    valPrevistoEl.innerText = formatCurrencyBRL(acumulado.previsto);
+    valGastoEl.innerText = formatCurrencyBRL(acumulado.gasto);
+}
+
+// Combo do gráfico de acumulado: meses de Janeiro até o mês corrente. Preserva a seleção do
+// usuário entre atualizações de dados, contanto que ainda seja um mês válido.
+function populateContratosAcumuladoMesSelect() {
+    const select = document.getElementById('select-mes-contratos-acumulado');
+    if (!select) return;
+
+    const currentMonthIndex = new Date().getMonth(); // 0 = Janeiro
+    const hadOptions = select.options.length > 0;
+    const previousValue = select.value;
+
+    select.innerHTML = MONTHS_BR.slice(0, currentMonthIndex + 1)
+        .map((mes, idx) => `<option value="${idx}">${mes}</option>`).join('');
+
+    // Padrão: mês anterior ao corrente (ou o próprio Janeiro, se ainda não há mês anterior no ano).
+    const defaultIdx = currentMonthIndex > 0 ? currentMonthIndex - 1 : 0;
+    const keepPrevious = hadOptions && previousValue !== '' && Number(previousValue) <= currentMonthIndex;
+    select.value = keepPrevious ? previousValue : String(defaultIdx);
+}
+
+// Gráfico simples de Previsto x Gasto acumulado até o mês escolhido no combo acima — dinâmico
+// porque o combo é regerado a cada carga de dados a partir do mês corrente real.
+function renderContratosAcumuladoMesChart() {
+    const canvas = document.getElementById('chartContratosAcumuladoMes');
+    if (!canvas) return;
+
+    const select = document.getElementById('select-mes-contratos-acumulado');
+    const mesIdx = select && select.value !== '' ? Number(select.value) : Math.max(0, new Date().getMonth() - 1);
+    const mesNome = MONTHS_BR[mesIdx];
+
+    const titleEl = document.getElementById('contratos-acumulado-title');
+    if (titleEl) titleEl.innerText = `Previsto × Gasto Acumulado até ${mesNome}`;
+
+    const acumulado = getContratosAcumuladoAteMes(mesIdx);
+
+    if (chartContratosAcumuladoMesInstance) chartContratosAcumuladoMesInstance.destroy();
+
+    chartContratosAcumuladoMesInstance = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: [`Até ${mesNome}`],
+            datasets: [
+                { label: 'Previsto', data: [acumulado.previsto], backgroundColor: '#94a3b8', borderRadius: 4, maxBarThickness: 90 },
+                { label: 'Gasto', data: [acumulado.gasto], backgroundColor: '#0284c7', borderRadius: 4, maxBarThickness: 90 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'top' },
+                datalabels: { display: false },
+                tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatCurrencyBRL(ctx.raw)}` } }
+            },
+            scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrencyBRL(v) } } }
+        }
+    });
+}
+
 function buildContratosOrcamentoChart() {
     const canvas = document.getElementById('chartContratosOrcamento');
     if (!canvas) return;
@@ -385,4 +479,7 @@ function renderContratosIndicadores() {
     renderContratosDesvioTable();
     renderContratosPagamentosFuturos();
     buildContratosOrcamentoChart();
+    renderContratosKpiMesAnterior();
+    populateContratosAcumuladoMesSelect();
+    renderContratosAcumuladoMesChart();
 }

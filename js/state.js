@@ -30,3 +30,4 @@ let activeSorts = { ativos: 'none', parados: 'none', backlog: 'none', suspensos:
 // Contratos (aba Planejado2026) — planilha separada do portfólio de projetos.
 let contractsList = [];
 let chartContratosOrcamentoInstance = null;
+let chartContratosAcumuladoMesInstance = null;
