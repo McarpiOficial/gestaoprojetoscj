@@ -345,6 +345,7 @@ function getContratosAcumuladoAteMes(mesIdx) {
 function renderContratosKpiMesAnterior() {
     const valPrevistoEl = document.getElementById('contratos-total-previsto-mes-ant');
     const valGastoEl = document.getElementById('contratos-total-gasto-mes-ant');
+    const valEconomizadoEl = document.getElementById('contratos-valor-economizado');
     if (!valPrevistoEl || !valGastoEl) return;
 
     const titlePrevistoEl = document.getElementById('contratos-total-previsto-mes-ant-title');
@@ -356,6 +357,10 @@ function renderContratosKpiMesAnterior() {
         if (titleGastoEl) titleGastoEl.innerText = 'Total Gasto (até o mês anterior)';
         valPrevistoEl.innerText = '—';
         valGastoEl.innerText = '—';
+        if (valEconomizadoEl) {
+            valEconomizadoEl.innerText = '—';
+            valEconomizadoEl.style.color = 'var(--gray-600)';
+        }
         return;
     }
 
@@ -366,6 +371,12 @@ function renderContratosKpiMesAnterior() {
     const acumulado = getContratosAcumuladoAteMes(mesAnteriorIdx);
     valPrevistoEl.innerText = formatCurrencyBRL(acumulado.previsto);
     valGastoEl.innerText = formatCurrencyBRL(acumulado.gasto);
+
+    if (valEconomizadoEl) {
+        const economizado = acumulado.previsto - acumulado.gasto;
+        valEconomizadoEl.innerText = formatCurrencyBRL(economizado);
+        valEconomizadoEl.style.color = economizado >= 0 ? 'var(--color-success)' : 'var(--color-danger)';
+    }
 }
 
 // Combo do gráfico de acumulado: meses de Janeiro até o mês corrente. Preserva a seleção do
