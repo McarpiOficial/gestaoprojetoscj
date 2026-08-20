@@ -284,10 +284,14 @@ function buildGanttChart() {
     items.sort((a, b) => b.progressPercentage - a.progressPercentage);
     if (wrapper) wrapper.style.height = `${Math.max(320, items.length * 30)}px`;
 
+    // Status ANDAMENTO com progresso saturado em 100% não é conclusão — é a Dt.Fim já vencida
+    // (ver computeDaysLate) — mesmo critério usado na régua da tabela de Ativos.
+    const isOverdueComplete = (p) => p.progressPercentage === 100 && p.status.toUpperCase().trim() === 'ANDAMENTO';
+
     chartGanttInstance = new Chart(canvas, {
         type: 'bar',
-        data: { labels: items.map(p => p.ticket), datasets: [{ data: items.map(p => p.progressPercentage), backgroundColor: items.map(p => p.progressPercentage === 100 ? '#10b981' : '#0284c7'), borderRadius: 4, barThickness: 16, minBarLength: 6 }] },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: (context) => context.dataset.data[context.dataIndex] === 0 ? '#475569' : '#ffffff', anchor: (context) => context.dataset.data[context.dataIndex] === 0 ? 'end' : 'center', align: (context) => context.dataset.data[context.dataIndex] === 0 ? 'right' : 'center', font: { weight: 'bold', size: 11 }, formatter: (val) => val === 0 || val > 5 ? val + '%' : '' } }, scales: { x: { min: 0, max: 100, ticks: { display: false }, grid: { display: false } } } }
+        data: { labels: items.map(p => p.ticket), datasets: [{ data: items.map(p => p.progressPercentage), backgroundColor: items.map(p => isOverdueComplete(p) ? '#dc2626' : (p.progressPercentage === 100 ? '#10b981' : '#0284c7')), borderRadius: 4, barThickness: 16, minBarLength: 6 }] },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: (context) => context.dataset.data[context.dataIndex] === 0 ? '#475569' : '#ffffff', anchor: (context) => context.dataset.data[context.dataIndex] === 0 ? 'end' : 'center', align: (context) => context.dataset.data[context.dataIndex] === 0 ? 'right' : 'center', font: { weight: 'bold', size: 11 }, formatter: (val, context) => { const p = items[context.dataIndex]; if (isOverdueComplete(p)) return `${computeDaysLate(p)}d atraso`; return val === 0 || val > 5 ? val + '%' : ''; } } }, scales: { x: { min: 0, max: 100, ticks: { display: false }, grid: { display: false } } } }
     });
 }
 

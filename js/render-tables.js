@@ -192,11 +192,18 @@ function renderCategoryPanes(sortAtivos, sortParados, sortBacklog, sortSuspensos
     const renderRowAtivo = (p) => {
         let rHtml = `<span class="badge-na">Aguardando Cronograma</span>`;
         if (p.hasProgress) {
-            const completeClass = p.progressPercentage === 100 ? 'complete' : '';
-            rHtml = `<div class="progress-wrapper">
-                        <div class="progress-container"><div class="progress-fill ${completeClass}" style="width: ${p.progressPercentage}%"></div></div>
-                        <span class="progress-text">${p.progressPercentage}%</span>
-                     </div>${getDelayBadge(p)}`;
+            // Status ANDAMENTO com progresso saturado em 100% não significa concluído — significa
+            // que a Dt.Fim já passou (ver computeDaysLate). Nesse caso a régua de percentual não
+            // faz sentido: substitui por um aviso para revisar o prazo, mantendo o badge de atraso.
+            if (p.progressPercentage === 100 && p.status.toUpperCase().trim() === 'ANDAMENTO') {
+                rHtml = `<div class="progress-wrapper"><span class="progress-review-prazo">Rever prazo início/fim</span></div>${getDelayBadge(p)}`;
+            } else {
+                const completeClass = p.progressPercentage === 100 ? 'complete' : '';
+                rHtml = `<div class="progress-wrapper">
+                            <div class="progress-container"><div class="progress-fill ${completeClass}" style="width: ${p.progressPercentage}%"></div></div>
+                            <span class="progress-text">${p.progressPercentage}%</span>
+                         </div>${getDelayBadge(p)}`;
+            }
         }
         return `<tr id="row-${p.id}"><td class="col-ticket" data-label="Ticket / Nome do Projeto">${escapeHtml(p.ticket)}${getStagnationFlag(p)}</td><td class="col-sec" data-label="Secretaria"><b>${escapeHtml(p.secretaria)}</b></td><td class="col-class" data-label="Classificação">${getClassificationBadge(p.classificacao)}</td><td class="col-status" data-label="Status">${getStatusBadge(p.status, 'ativos')}</td><td class="col-regua" data-label="Avanço p/ DT. ENTREGA">${rHtml}</td><td class="col-importancia" data-label="Importância">${getImportanceBadge(p.importancia)}</td><td class="col-risco" data-label="Risco">${getRiskBadge(p)}</td><td class="col-acoes" data-label="Ações"><button class="action-btn" onclick="openProjectModal(${p.id})">🔍</button></td></tr>`;
     };

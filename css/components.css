@@ -190,6 +190,7 @@
 
 /* Indicadores de PMO derivados (Fase 5): atraso, estagnação, risco (RAG) e aging */
 .badge-atraso { display: inline-block; margin-top: 4px; background-color: var(--color-danger-soft); color: var(--color-danger); padding: 2px 8px; border-radius: var(--radius-sm); font-size: 10px; font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+.progress-review-prazo { color: var(--color-danger); font-weight: var(--fw-bold); font-size: var(--fs-sm); white-space: nowrap; }
 
 .ticket-stagnant-flag { font-size: 10px; font-weight: var(--fw-semibold); color: var(--color-warning-dark); margin-top: 3px; text-transform: none; letter-spacing: 0; white-space: normal; }
 
