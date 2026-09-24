@@ -1,25 +1,14 @@
-// Telas "Planejamento" (menu lateral): compara PE_METAS / PG_PROPOSTAS (js/planejamento-data.js,
-// texto estático extraído dos PDFs) contra parsedProjectsList (planilha, já carregada por
-// data-fetch.js) para decidir ao vivo se cada meta/proposta está Atendida, Em Andamento ou
-// Faltante. Nada aqui é fixado: se um projeto mudar de aba/status na planilha, o resultado
-// muda sozinho na próxima renderização.
+// Telas "Planejamento" (menu lateral): agrupa os projetos das abas "Projetos Recebidos",
+// "CIINTEC" e "Finalizados" pelos vínculos que a própria planilha já guarda — coluna L
+// ("Plano Governo") e coluna M ("Planej. Estratégico"), carregadas em cada projeto como
+// `planoGovernoLink` / `planejEstrategicoLink` (js/data-fetch.js) — em vez de tentar adivinhar
+// o vínculo pelo nome do ticket. O status (Atendido/Andamento/Faltante) é sempre calculado ao
+// vivo a partir de quem está vinculado a cada item; nada fica fixado em planejamento-data.js.
 
-// Só projetos da aba principal (ativos/parados/backlog) e da aba Finalizados (encerrados)
-// contam — CIINTEC e a aba separada de Suspensos antigos ficam fora do escopo do PE/PG.
+// As 3 abas que a planilha usa para vincular projetos a Planejamento — Suspenso (a aba
+// separada de projetos antigos parados) fica de fora por não ter essas colunas.
 function planejamentoProjectPool() {
-    return parsedProjectsList.filter(p => ['ativos', 'parados', 'backlog', 'encerrados'].includes(p.viewCategory));
-}
-
-// Casa uma lista de trechos de nome de ticket (de planejamento-data.js) contra a planilha,
-// via normalizeString + includes (mesma função usada no resto do projeto, utils.js:3).
-function matchPlanejamentoProjects(fragmentos) {
-    if (!fragmentos || !fragmentos.length) return [];
-    const pool = planejamentoProjectPool();
-    const fragsNorm = fragmentos.map(normalizeString);
-    return pool.filter(p => {
-        const ticketNorm = normalizeString(p.ticket);
-        return fragsNorm.some(f => f && ticketNorm.includes(f));
-    });
+    return parsedProjectsList.filter(p => ['ativos', 'parados', 'backlog', 'encerrados', 'ciintec'].includes(p.viewCategory));
 }
 
 function isProjectAtendido(p) {
@@ -30,6 +19,44 @@ function classifyPlanejamentoStatus(matched) {
     if (matched.some(isProjectAtendido)) return 'atendido';
     if (matched.length > 0) return 'andamento';
     return 'faltante';
+}
+
+// A coluna L ("Plano Governo") normalmente vem como "N – rótulo curto" (o número é a posição
+// do item na aba "Plano Governo", 1 a 13). Extrai esse número; se não achar (algumas linhas
+// têm o texto completo colado em vez do rótulo numerado), cai para casar o texto contra o
+// item correspondente em PG_PROPOSTAS.
+function extractPlanoGovernoNumero(linkText) {
+    if (!linkText) return null;
+    const semNumero = linkText.trim();
+    const m = semNumero.match(/^(\d{1,2})\s*[–—\-−]/);
+    if (m) {
+        const n = parseInt(m[1], 10);
+        if (PG_PROPOSTAS.some(item => item.numero === n)) return n;
+    }
+    const norm = normalizeString(semNumero.replace(/;\s*$/, ''));
+    const found = PG_PROPOSTAS.find(item => {
+        const itemNorm = normalizeString(item.texto);
+        return norm === itemNorm || norm.includes(itemNorm) || itemNorm.includes(norm);
+    });
+    return found ? found.numero : null;
+}
+
+function matchPlanoGovernoProjects(numero) {
+    return planejamentoProjectPool().filter(p => extractPlanoGovernoNumero(p.planoGovernoLink) === numero);
+}
+
+// A coluna M ("Planej. Estratégico") vem como "Ação - Meta" (texto livre, às vezes com tab
+// solto no início). Compara normalizado contra o `linkText` de cada meta em PE_METAS.
+function isPlanejEstrategicoMatch(linkText, metaLinkText) {
+    if (!linkText || !metaLinkText) return false;
+    const a = normalizeString(linkText);
+    const b = normalizeString(metaLinkText);
+    return a === b || a.includes(b) || b.includes(a);
+}
+
+function matchPlanejEstrategicoProjects(metaLinkText) {
+    if (!metaLinkText) return [];
+    return planejamentoProjectPool().filter(p => isPlanejEstrategicoMatch(p.planejEstrategicoLink, metaLinkText));
 }
 
 function renderPlanejamento() {
@@ -56,7 +83,7 @@ function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched }) {
 function renderPlanejamentoEstrategico() {
     const anoAtual = PLANEJAMENTO_ANO_ATUAL;
     const computed = PE_METAS.map(meta => {
-        const matched = matchPlanejamentoProjects(meta.projetos);
+        const matched = matchPlanejEstrategicoProjects(meta.linkText);
         const status = classifyPlanejamentoStatus(matched);
         const futuro = status === 'faltante' && meta.ano > anoAtual;
         return { meta, matched, status, futuro };
@@ -108,10 +135,8 @@ function renderPlanejamentoEstrategico() {
 }
 
 function renderPlanoGoverno() {
-    const claimedIds = new Set();
     const computed = PG_PROPOSTAS.map(prop => {
-        const matched = matchPlanejamentoProjects(prop.projetos);
-        matched.forEach(p => claimedIds.add(p.id));
+        const matched = matchPlanoGovernoProjects(prop.numero);
         const status = classifyPlanejamentoStatus(matched);
         return { prop, matched, status };
     });
@@ -125,17 +150,6 @@ function renderPlanoGoverno() {
     document.getElementById('pg-kpi-atendido').textContent = `${pct(atendido)}%`;
     document.getElementById('pg-kpi-restante').textContent = `${pct(andamento + faltante)}%`;
     document.getElementById('pg-kpi-restante-detalhe').textContent = `andamento ${pct(andamento)}% · faltante ${pct(faltante)}%`;
-
-    // Card "outros": projetos com a tag PL.GOV na planilha que não foram reivindicados por
-    // nenhuma proposta CIJUN acima — contador simples pedido pelo usuário, sem lista detalhada.
-    const outros = planejamentoProjectPool().filter(p => {
-        if (claimedIds.has(p.id)) return false;
-        const imp = normalizeString(p.importancia || '');
-        return imp.includes(normalizeString('PL.GOV'));
-    });
-    const outrosAtendido = outros.filter(isProjectAtendido).length;
-    const outrosAndamento = outros.length - outrosAtendido;
-    document.getElementById('pg-kpi-outros').textContent = `${outrosAtendido} atendidos · ${outrosAndamento} em andamento`;
 
     if (chartPlanoGovernoInstance) chartPlanoGovernoInstance.destroy();
     const canvas = document.getElementById('chartPlanoGoverno');
@@ -153,9 +167,9 @@ function renderPlanoGoverno() {
     const groups = { atendido: [], andamento: [], faltante: [] };
     computed.forEach(c => {
         groups[c.status].push(planItemHtml({
-            badgeText: '2025-2028', badgeClass: '',
+            badgeText: `Item ${c.prop.numero}`, badgeClass: '',
             titleHtml: escapeHtml(c.prop.texto),
-            subHtml: 'Plano de Governo — Eixo Tecnologia',
+            subHtml: 'Plano de Governo 2025-2028 — Eixo Tecnologia',
             matched: c.matched
         }));
     });

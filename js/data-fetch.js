@@ -158,7 +158,12 @@ function processSheetTable(response, config, startId) {
             ultAtualizDate: parseBrazilianDate(ultAtualizStr),
             deliveredDateStr: config.computeDeliveredDate ? extractDeliveredMonthYear(andamentoText) : '-',
             progressPercentage: config.fixedProgress,
-            hasProgress: false
+            hasProgress: false,
+            // Vínculo direto com os itens de Planejamento (colunas L e M da planilha, ver
+            // js/render-planejamento.js) — presentes em "Projetos Recebidos", "CIINTEC" e
+            // "Finalizados"; ficam vazios nas abas que não têm essas colunas (ex. Suspenso).
+            planoGovernoLink: getVal('Plano Governo'),
+            planejEstrategicoLink: getVal('Planej. Estratégico')
         };
 
         if (config.hasDates) {
