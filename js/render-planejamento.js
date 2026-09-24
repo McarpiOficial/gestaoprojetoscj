@@ -148,8 +148,8 @@ function renderPlanoGoverno() {
     const pct = (n) => Math.round((n / total) * 100);
 
     document.getElementById('pg-kpi-atendido').textContent = `${pct(atendido)}%`;
-    document.getElementById('pg-kpi-restante').textContent = `${pct(andamento + faltante)}%`;
-    document.getElementById('pg-kpi-restante-detalhe').textContent = `andamento ${pct(andamento)}% · faltante ${pct(faltante)}%`;
+    document.getElementById('pg-kpi-andamento').textContent = `${pct(andamento)}%`;
+    document.getElementById('pg-kpi-faltante').textContent = `${pct(faltante)}%`;
 
     if (chartPlanoGovernoInstance) chartPlanoGovernoInstance.destroy();
     const canvas = document.getElementById('chartPlanoGoverno');
