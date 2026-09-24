@@ -66,6 +66,14 @@ function renderPlanejamento() {
     renderPlanoGoverno();
 }
 
+// Os grupos Atendido/Em Andamento/Faltante começam fechados (ver .plan-group no CSS); clicar
+// no título expande/recolhe. Só mexe na classe do grupo clicado — o conteúdo é recriado a cada
+// renderPlanejamento() sem depender do estado aberto/fechado, que fica só no DOM do cabeçalho.
+function togglePlanGroup(headerEl) {
+    const group = headerEl.closest('.plan-group');
+    if (group) group.classList.toggle('expanded');
+}
+
 function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched }) {
     const chips = matched.length
         ? `<div class="plan-item-projects">${matched.map(p => `<span class="plan-project-chip" onclick="openProjectModal(${p.id})" title="${escapeHtml(p.secretaria)} — clique para abrir">${escapeHtml(p.ticket)} <small>(${escapeHtml(p.status)})</small></span>`).join('')}</div>`
@@ -132,6 +140,10 @@ function renderPlanejamentoEstrategico() {
     document.getElementById('pe-list-atendido').innerHTML = groups.atendido.join('') || '<p class="plan-list-empty">Nenhuma meta atendida ainda.</p>';
     document.getElementById('pe-list-andamento').innerHTML = groups.andamento.join('') || '<p class="plan-list-empty">Nenhuma meta em andamento.</p>';
     document.getElementById('pe-list-faltante').innerHTML = groups.faltante.join('') || '<p class="plan-list-empty">Nenhuma meta faltante.</p>';
+
+    document.getElementById('pe-count-atendido').textContent = `(${atendido})`;
+    document.getElementById('pe-count-andamento').textContent = `(${andamento})`;
+    document.getElementById('pe-count-faltante').textContent = `(${faltanteTotal})`;
 }
 
 function renderPlanoGoverno() {
@@ -177,4 +189,8 @@ function renderPlanoGoverno() {
     document.getElementById('pg-list-atendido').innerHTML = groups.atendido.join('') || '<p class="plan-list-empty">Nenhuma proposta atendida ainda.</p>';
     document.getElementById('pg-list-andamento').innerHTML = groups.andamento.join('') || '<p class="plan-list-empty">Nenhuma proposta em andamento.</p>';
     document.getElementById('pg-list-faltante').innerHTML = groups.faltante.join('') || '<p class="plan-list-empty">Nenhuma proposta faltante.</p>';
+
+    document.getElementById('pg-count-atendido').textContent = `(${atendido})`;
+    document.getElementById('pg-count-andamento').textContent = `(${andamento})`;
+    document.getElementById('pg-count-faltante').textContent = `(${faltante})`;
 }

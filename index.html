@@ -779,16 +779,25 @@
 				</div>
 
 				<div class="gestao-interna-container">
-					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
-						<h2 class="gi-group-title" style="color: #065f46;"><i class="ph-bold ph-check-circle"></i> Atendido</h2>
+					<div class="gi-group plan-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title plan-group-toggle" style="color: #065f46; justify-content: space-between; cursor: pointer;" onclick="togglePlanGroup(this)">
+							<span style="display:flex; align-items:center; gap:12px;"><i class="ph-bold ph-check-circle"></i> Atendido <span id="pe-count-atendido" class="plan-group-count"></span></span>
+							<i class="ph-bold ph-caret-down plan-group-caret"></i>
+						</h2>
 						<div id="pe-list-atendido" class="plan-list"></div>
 					</div>
-					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
-						<h2 class="gi-group-title" style="color: #0369a1;"><i class="ph-bold ph-clock-countdown"></i> Em Andamento</h2>
+					<div class="gi-group plan-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title plan-group-toggle" style="color: #0369a1; justify-content: space-between; cursor: pointer;" onclick="togglePlanGroup(this)">
+							<span style="display:flex; align-items:center; gap:12px;"><i class="ph-bold ph-clock-countdown"></i> Em Andamento <span id="pe-count-andamento" class="plan-group-count"></span></span>
+							<i class="ph-bold ph-caret-down plan-group-caret"></i>
+						</h2>
 						<div id="pe-list-andamento" class="plan-list"></div>
 					</div>
-					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
-						<h2 class="gi-group-title" style="color: #b91c1c;"><i class="ph-bold ph-warning-circle"></i> Faltante</h2>
+					<div class="gi-group plan-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title plan-group-toggle" style="color: #b91c1c; justify-content: space-between; cursor: pointer;" onclick="togglePlanGroup(this)">
+							<span style="display:flex; align-items:center; gap:12px;"><i class="ph-bold ph-warning-circle"></i> Faltante <span id="pe-count-faltante" class="plan-group-count"></span></span>
+							<i class="ph-bold ph-caret-down plan-group-caret"></i>
+						</h2>
 						<div id="pe-list-faltante" class="plan-list"></div>
 					</div>
 				</div>
@@ -807,16 +816,25 @@
 				</div>
 
 				<div class="gestao-interna-container">
-					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
-						<h2 class="gi-group-title" style="color: #065f46;"><i class="ph-bold ph-check-circle"></i> Atendido</h2>
+					<div class="gi-group plan-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title plan-group-toggle" style="color: #065f46; justify-content: space-between; cursor: pointer;" onclick="togglePlanGroup(this)">
+							<span style="display:flex; align-items:center; gap:12px;"><i class="ph-bold ph-check-circle"></i> Atendido <span id="pg-count-atendido" class="plan-group-count"></span></span>
+							<i class="ph-bold ph-caret-down plan-group-caret"></i>
+						</h2>
 						<div id="pg-list-atendido" class="plan-list"></div>
 					</div>
-					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
-						<h2 class="gi-group-title" style="color: #0369a1;"><i class="ph-bold ph-clock-countdown"></i> Em Andamento</h2>
+					<div class="gi-group plan-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title plan-group-toggle" style="color: #0369a1; justify-content: space-between; cursor: pointer;" onclick="togglePlanGroup(this)">
+							<span style="display:flex; align-items:center; gap:12px;"><i class="ph-bold ph-clock-countdown"></i> Em Andamento <span id="pg-count-andamento" class="plan-group-count"></span></span>
+							<i class="ph-bold ph-caret-down plan-group-caret"></i>
+						</h2>
 						<div id="pg-list-andamento" class="plan-list"></div>
 					</div>
-					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
-						<h2 class="gi-group-title" style="color: #b91c1c;"><i class="ph-bold ph-warning-circle"></i> Faltante</h2>
+					<div class="gi-group plan-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title plan-group-toggle" style="color: #b91c1c; justify-content: space-between; cursor: pointer;" onclick="togglePlanGroup(this)">
+							<span style="display:flex; align-items:center; gap:12px;"><i class="ph-bold ph-warning-circle"></i> Faltante <span id="pg-count-faltante" class="plan-group-count"></span></span>
+							<i class="ph-bold ph-caret-down plan-group-caret"></i>
+						</h2>
 						<div id="pg-list-faltante" class="plan-list"></div>
 					</div>
 				</div>
