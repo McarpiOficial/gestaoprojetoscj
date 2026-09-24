@@ -401,6 +401,57 @@
     opacity: 0.85;
 }
 
+/* Telas Planejamento (Planej. Estratégico / Plano Governo) — listas de metas/propostas
+   dentro dos .gi-group já existentes, ver js/render-planejamento.js. */
+.plan-list { display: flex; flex-direction: column; gap: var(--space-3); }
+.plan-list-empty { font-size: var(--fs-sm); color: var(--text-muted); padding: var(--space-2) 0; }
+
+.plan-item {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+}
+
+.plan-item-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.plan-item-title { font-size: var(--fs-sm); font-weight: var(--fw-semibold); color: var(--text-title); }
+.plan-item-sub { font-size: var(--fs-xs); color: var(--text-muted); margin-top: var(--space-1); }
+
+.plan-year-badge {
+    flex-shrink: 0;
+    background-color: var(--gray-600);
+    color: #ffffff;
+    padding: 2px 10px;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    white-space: nowrap;
+}
+
+.plan-year-badge.futuro { background-color: var(--color-warning-dark); }
+
+.plan-item-projects { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+
+.plan-project-chip {
+    cursor: pointer;
+    background-color: var(--color-primary-soft, var(--gray-100));
+    color: var(--color-primary);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.plan-project-chip:hover { text-decoration: underline; }
+.plan-project-chip small { font-weight: var(--fw-normal); opacity: 0.75; }
+
 .gi-btn {
     display: flex;
     align-items: center;

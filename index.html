@@ -54,6 +54,13 @@
                     <li><button type="button" class="menu-item" onclick="switchView('gestao-interna', this)"><i class="ph-bold ph-briefcase"></i><span class="menu-label">Gestão Interna</span></button></li>
                 </ul>
             </li>
+            <li class="menu-group" data-group="planejamento">
+                <button type="button" class="menu-group-toggle" onclick="toggleMenuGroup(this)" aria-expanded="false"><i class="ph-bold ph-target"></i><span class="menu-label">Planejamento</span><i class="ph-bold ph-caret-down menu-group-caret"></i></button>
+                <ul class="menu-subgroup">
+                    <li><button type="button" class="menu-item" onclick="switchView('planej-estrategico', this)"><i class="ph-bold ph-compass"></i><span class="menu-label">Planej. Estratégico</span></button></li>
+                    <li><button type="button" class="menu-item" onclick="switchView('plano-governo', this)"><i class="ph-bold ph-scroll"></i><span class="menu-label">Plano Governo</span></button></li>
+                </ul>
+            </li>
             <li class="menu-group" data-group="contratos">
                 <button type="button" class="menu-group-toggle" onclick="toggleMenuGroup(this)" aria-expanded="false"><i class="ph-bold ph-file-text"></i><span class="menu-label">Contratos</span><i class="ph-bold ph-caret-down menu-group-caret"></i></button>
                 <ul class="menu-subgroup">
@@ -757,6 +764,63 @@
 					</div>
 				</div>
 			</section>
+
+			<section id="pane-planej-estrategico" class="view-pane">
+				<div class="kpi-grid">
+					<div class="kpi-card"><h3>% Atendido</h3><p id="pe-kpi-atendido" style="color: var(--color-success);">0%</p></div>
+					<div class="kpi-card"><h3>% Restante</h3><p id="pe-kpi-restante" style="color: var(--color-danger);">0%</p><span id="pe-kpi-restante-detalhe" style="font-size: var(--fs-xs); color: var(--text-muted);"></span></div>
+					<div class="kpi-card"><h3 title="Metas previstas para 2027/2028, ainda sem projeto pois nem começaram">% Faltante Futuro (2027-2028) ⓘ</h3><p id="pe-kpi-futuro" style="color: var(--gray-600);">0%</p><span style="font-size: var(--fs-xs); color: var(--text-muted);">previsto para iniciar a partir de 2027</span></div>
+					<div class="kpi-card"><h3 title="Metas com previsão até o ano corrente que ainda não têm projeto vinculado">% Faltante Atual (até 2026) ⓘ</h3><p id="pe-kpi-atual" style="color: var(--color-warning-dark);">0%</p></div>
+				</div>
+
+				<div class="chart-card" style="grid-column: 1 / -1; margin-bottom: 20px;">
+					<div class="chart-title" style="margin-bottom:16px;">Planejamento Estratégico DT — Atendido × Andamento × Faltante</div>
+					<div class="chart-container-box" style="max-height: 300px;"><canvas id="chartPlanEstrategico"></canvas></div>
+				</div>
+
+				<div class="gestao-interna-container">
+					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title" style="color: #065f46;"><i class="ph-bold ph-check-circle"></i> Atendido</h2>
+						<div id="pe-list-atendido" class="plan-list"></div>
+					</div>
+					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title" style="color: #0369a1;"><i class="ph-bold ph-clock-countdown"></i> Em Andamento</h2>
+						<div id="pe-list-andamento" class="plan-list"></div>
+					</div>
+					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title" style="color: #b91c1c;"><i class="ph-bold ph-warning-circle"></i> Faltante</h2>
+						<div id="pe-list-faltante" class="plan-list"></div>
+					</div>
+				</div>
+			</section>
+
+			<section id="pane-plano-governo" class="view-pane">
+				<div class="kpi-grid">
+					<div class="kpi-card"><h3>% Atendido (propostas CIJUN)</h3><p id="pg-kpi-atendido" style="color: var(--color-success);">0%</p></div>
+					<div class="kpi-card"><h3>% Restante (propostas CIJUN)</h3><p id="pg-kpi-restante" style="color: var(--color-danger);">0%</p><span id="pg-kpi-restante-detalhe" style="font-size: var(--fs-xs); color: var(--text-muted);"></span></div>
+					<div class="kpi-card" title="Projetos com a tag PL.GOV na planilha que atendem outras propostas do Plano de Governo, fora do escopo de sistemas/dados da CIJUN"><h3>Outras Propostas do Plano (fora do escopo CIJUN) ⓘ</h3><p id="pg-kpi-outros" style="font-size: var(--fs-lg); color: var(--gray-600);">0 atendidos · 0 em andamento</p></div>
+				</div>
+
+				<div class="chart-card" style="grid-column: 1 / -1; margin-bottom: 20px;">
+					<div class="chart-title" style="margin-bottom:16px;">Plano de Governo 2025-2028 — Propostas CIJUN: Atendido × Andamento × Faltante</div>
+					<div class="chart-container-box" style="max-height: 300px;"><canvas id="chartPlanoGoverno"></canvas></div>
+				</div>
+
+				<div class="gestao-interna-container">
+					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title" style="color: #065f46;"><i class="ph-bold ph-check-circle"></i> Atendido</h2>
+						<div id="pg-list-atendido" class="plan-list"></div>
+					</div>
+					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title" style="color: #0369a1;"><i class="ph-bold ph-clock-countdown"></i> Em Andamento</h2>
+						<div id="pg-list-andamento" class="plan-list"></div>
+					</div>
+					<div class="gi-group" style="background-color: var(--card-bg); border: 1px solid var(--border);">
+						<h2 class="gi-group-title" style="color: #b91c1c;"><i class="ph-bold ph-warning-circle"></i> Faltante</h2>
+						<div id="pg-list-faltante" class="plan-list"></div>
+					</div>
+				</div>
+			</section>
         </div>
     </main>
 
@@ -837,6 +901,8 @@
     <script src="js/render-contratos.js"></script>
     <script src="js/render-charts.js"></script>
     <script src="js/render-gestao-interna.js"></script>
+    <script src="js/planejamento-data.js"></script>
+    <script src="js/render-planejamento.js"></script>
     <script src="js/ui-navigation.js"></script>
     <script src="js/ui-modals.js"></script>
     <script src="js/search.js"></script>

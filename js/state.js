@@ -31,3 +31,8 @@ let activeSorts = { ativos: 'none', parados: 'none', backlog: 'none', suspensos:
 let contractsList = [];
 let chartContratosOrcamentoInstance = null;
 let chartContratosAcumuladoMesInstance = null;
+
+// Planejamento (Planej. Estratégico / Plano Governo) — comparação de PE_METAS/PG_PROPOSTAS
+// (js/planejamento-data.js) contra parsedProjectsList, feita em js/render-planejamento.js.
+let chartPlanEstrategicoInstance = null;
+let chartPlanoGovernoInstance = null;

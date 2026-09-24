@@ -302,4 +302,5 @@ function renderCategoryPanes(sortAtivos, sortParados, sortBacklog, sortSuspensos
     const selectSecretaria = document.getElementById('select-secretaria');
     if (selectSecretaria) renderVisaoSecretaria(selectSecretaria.value);
     buildAllCharts();
+    renderPlanejamento();
 }

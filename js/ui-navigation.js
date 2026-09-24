@@ -126,7 +126,9 @@ function switchView(viewName, element) {
         'estrutura-ferramentas': 'Estrutura Ferramentas',
         'acompanhamento-prefeitura': 'Acompanhamento Prefeitura',
         'contratos-acompanhamento': 'Contratos - Acompanhamento',
-        'contratos-indicadores': 'Contratos - Indicadores Gestão'
+        'contratos-indicadores': 'Contratos - Indicadores Gestão',
+        'planej-estrategico': 'Planejamento Estratégico',
+        'plano-governo': 'Plano de Governo'
     };
     document.getElementById('view-title').innerText = titles[viewName];
     document.querySelectorAll('.view-pane').forEach(pane => pane.classList.remove('active'));
@@ -138,6 +140,10 @@ function switchView(viewName, element) {
 
     if (viewName === 'contratos-indicadores') {
         renderContratosIndicadores();
+    }
+
+    if (viewName === 'planej-estrategico' || viewName === 'plano-governo') {
+        renderPlanejamento();
     }
 
     if (window.innerWidth <= 767) closeSidebar();
