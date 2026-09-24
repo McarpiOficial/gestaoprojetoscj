@@ -155,7 +155,7 @@ function renderPlanoGoverno() {
         groups[c.status].push(planItemHtml({
             badgeText: '2025-2028', badgeClass: '',
             titleHtml: escapeHtml(c.prop.texto),
-            subHtml: `Eixo ${escapeHtml(c.prop.eixo)}`,
+            subHtml: 'Plano de Governo — Eixo Tecnologia',
             matched: c.matched
         }));
     });

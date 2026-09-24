@@ -75,18 +75,23 @@ const PE_METAS = [
 ];
 
 // ---------------------------------------------------------------------------------------
-// Plano de Governo 2025-2028 - só as propostas do Eixo 21 (TECNOLOGIA), que é literalmente
-// o eixo da CIJUN no plano (págs. 205-212). Os indicadores desta tela usam só essas 5
-// propostas. As propostas de TI que aparecem em outros eixos (Saúde, Finanças, Segurança
-// etc.) pertencem organizacionalmente àquela secretaria no plano, não à CIJUN — mesmo que a
-// CIJUN construa o sistema — então não entram aqui: contam só no card agregado "outras
-// propostas do plano", calculado dinamicamente em js/render-planejamento.js a partir de
-// todo projeto com a tag PL.GOV na planilha que não esteja em nenhuma proposta abaixo.
+// Plano de Governo 2025-2028 - os itens são os 13 itens reais da própria planilha de
+// projetos, aba "Plano Governo", coluna A (a empresa já filtrou ali só os itens do eixo
+// Tecnologia que dizem respeito a sistemas — por isso são usados literalmente, sem seleção
+// nossa por cima). `projetos` continua sendo o vínculo manual com a planilha de projetos.
 // ---------------------------------------------------------------------------------------
 const PG_PROPOSTAS = [
-    { id: 'pg37', eixo: '21. Tecnologia', texto: 'Instituir um Programa de Aperfeiçoamento Tecnológico para investigar, avaliar, desenvolver e implementar ferramentas, processos e procedimentos na administração municipal', projetos: ['Estudo ANIA - IA do SEI'] },
-    { id: 'pg38', eixo: '21. Tecnologia', texto: 'Ampliar a oferta de Wifi em equipamentos públicos, praças e espaços públicos', projetos: [] },
-    { id: 'pg39', eixo: '21. Tecnologia', texto: 'Fomentar iniciativas em inteligência artificial com aplicação direta na prefeitura: chatbot/PNL para dúvidas e OCR/Deep Learning para documentação', projetos: ['Reestruturação Chatbot Ju', 'Chatbot Saepro', 'APIs para os Chatbots'] },
-    { id: 'pg40', eixo: '21. Tecnologia', texto: 'Adotar os princípios de "Smart Cities", integrando tecnologia aos setores de saneamento, energia e meio ambiente', projetos: ['GeoEspacial. SIMIH', 'Novo GeoJundiaí'] },
-    { id: 'pg41', eixo: '21. Tecnologia', texto: 'Analisar sistema de monitoramento da qualidade da água, painéis fotovoltaicos com monitoramento remoto e sensores em bueiros e depósitos de lixo', projetos: [] }
+    { id: 'pg1', texto: 'Usar a tecnologia para criar uma cidade mais inteligente, conectada, inovadora e dinâmica', projetos: [] },
+    { id: 'pg2', texto: 'Instituir um Programa de Aperfeiçoamento Tecnológico destinado a investigar, avaliar, desenvolver e implementar ferramentas, processos e procedimentos nas diversas áreas da administração municipal, para sugerir, criar e implementar soluções tecnológicas que otimizem os serviços', projetos: ['Estudo ANIA - IA do SEI', 'Atualizar SEI PMJ v5'] },
+    { id: 'pg3', texto: 'Criar o "Fórum Anual de Inovação e Novas Tecnologias" para promover o engajamento de empreendedores, inovadores e especialistas em tecnologia', projetos: [] },
+    { id: 'pg4', texto: 'Potencializar a política de compras governamentais eletrônicas', projetos: ['Melhorias Sist. Compras'] },
+    { id: 'pg5', texto: 'Desenvolver parcerias com empresas privadas para estimular investimentos e criar oportunidades tecnológicas', projetos: [] },
+    { id: 'pg6', texto: 'Estudar a possibilidade de implantar um laboratório multidisciplinar de tecnologia no município, incentivando o desenvolvimento de soluções tecnológicas e pesquisas inovadoras no campo da ciência da computação', projetos: [] },
+    { id: 'pg7', texto: 'Incentivar a cultura maker', projetos: [] },
+    { id: 'pg8', texto: 'Estimular um ambiente que inspire e motive as pessoas a usar a imaginação para desenvolver soluções que resolvam problemas, fomentando a criatividade', projetos: [] },
+    { id: 'pg9', texto: 'Disponibilizar cursos profissionalizantes gratuitos para pessoas em situação de vulnerabilidade social, idosos, crianças e pessoas com deficiência', projetos: [] },
+    { id: 'pg10', texto: 'Fomentar iniciativas em inteligência artificial com aplicação direta na prefeitura, como atendimento ao munícipe por chatbot/PNL e recebimento de documentação enviada digitalmente utilizando OCR e Deep Learning', projetos: ['Reestruturação Chatbot Ju', 'Chatbot Saepro', 'APIs para os Chatbots'] },
+    { id: 'pg11', texto: 'Implantar uma metodologia de análise e diagnóstico das necessidades da população, focada em um pensamento digital centrado no cidadão', projetos: [] },
+    { id: 'pg12', texto: 'Adotar os princípios de "Smart Cities" e cidades sustentáveis, integrando tecnologia aos setores de saneamento, energia e meio ambiente', projetos: ['GeoEspacial. SIMIH', 'Novo GeoJundiaí'] },
+    { id: 'pg13', texto: 'Implementar um modelo de transformação do pensamento do cidadão voltado ao mundo digital, através do esforço colaborativo entre múltiplos patrocinadores', projetos: [] }
 ];
