@@ -177,8 +177,7 @@ function renderPlanejamentoEstrategico() {
             titleHtml: `${escapeHtml(c.meta.acao)}: ${escapeHtml(c.meta.meta)}`,
             subHtml: 'Planej. Estratégico — aba "Planej. Estrategico"',
             matched: c.matched,
-            showOrigin: c.status === 'andamento',
-            closedCount: c.status === 'andamento' ? c.matched.filter(isProjectAtendido).length : 0
+            showOrigin: c.status === 'andamento'
         }));
     });
 
