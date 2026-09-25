@@ -106,7 +106,7 @@ function projectOriginLabel(p) {
     return null;
 }
 
-function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, showOrigin, closedCount = 0 }) {
+function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, showOrigin }) {
     const chips = matched.length
         ? `<div class="plan-item-projects">${matched.map(p => {
             const origin = showOrigin ? projectOriginLabel(p) : null;
@@ -114,16 +114,9 @@ function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, show
             return `<span class="plan-project-chip" onclick="openProjectModal(${p.id})" title="${escapeHtml(p.secretaria)} — clique para abrir">${originPrefix}${escapeHtml(p.ticket)} <small>(${escapeHtml(p.status)})</small></span>`;
         }).join('')}</div>`
         : '';
-    // Só passado (>0) em itens do grupo Em Andamento — não muda a classificação/percentuais,
-    // é só um aviso visual de que, pela regra atual, isso não deveria acontecer (qualquer
-    // projeto já finalizado joga o item inteiro pro grupo Atendido). Serve pra confirmar de
-    // relance que os itens aqui são mesmo só de projetos em andamento.
-    const closedBadge = closedCount > 0
-        ? ` <span class="plan-item-closed-badge" title="${closedCount} projeto${closedCount > 1 ? 's' : ''} já finalizado${closedCount > 1 ? 's' : ''} vinculado${closedCount > 1 ? 's' : ''} a este item.">(${closedCount})</span>`
-        : '';
     return `<div class="plan-item">
         <div class="plan-item-header">
-            <span class="plan-item-title">${titleHtml}${closedBadge}</span>
+            <span class="plan-item-title">${titleHtml}</span>
             <span class="plan-year-badge ${badgeClass}">${badgeText}</span>
         </div>
         <div class="plan-item-sub">${subHtml}</div>
@@ -177,8 +170,7 @@ function renderPlanejamentoEstrategico() {
             titleHtml: `${escapeHtml(c.meta.acao)}: ${escapeHtml(c.meta.meta)}`,
             subHtml: 'Planej. Estratégico — aba "Planej. Estrategico"',
             matched: c.matched,
-            showOrigin: c.status === 'andamento',
-            closedCount: c.status === 'andamento' ? c.matched.filter(isProjectAtendido).length : 0
+            showOrigin: c.status === 'andamento'
         }));
     });
 
@@ -228,8 +220,7 @@ function renderPlanoGoverno() {
             titleHtml: escapeHtml(c.prop.texto),
             subHtml: 'Plano de Governo 2025-2028 — Eixo Tecnologia',
             matched: c.matched,
-            showOrigin: c.status === 'andamento',
-            closedCount: c.status === 'andamento' ? c.matched.filter(isProjectAtendido).length : 0
+            showOrigin: c.status === 'andamento'
         }));
     });
 
