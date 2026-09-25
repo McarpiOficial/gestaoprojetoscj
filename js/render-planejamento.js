@@ -21,19 +21,26 @@ function classifyPlanejamentoStatus(matched) {
     return 'faltante';
 }
 
-// A coluna L ("Plano Governo") normalmente vem como "N – rótulo curto" (o número é a posição
-// do item na aba "Plano Governo", 1 a 13). Extrai esse número; se não achar (algumas linhas
-// têm o texto completo colado em vez do rótulo numerado), cai para casar o texto contra o
-// item correspondente em PG_PROPOSTAS.
-function extractPlanoGovernoNumero(linkText) {
-    if (!linkText) return null;
-    const semNumero = linkText.trim();
-    const m = semNumero.match(/^(\d{1,2})\s*[–—\-−]/);
+// Um projeto pode estar vinculado a mais de um item ao mesmo tempo (interseção entre metas/
+// propostas) — nesse caso a célula tem vários valores separados por ";". Quebra em segmentos
+// individuais, descartando vazios (inclusive o "resto" depois de um ";" solto no fim do texto,
+// que é só pontuação da frase, não um segundo item).
+function splitLinkSegments(rawLinkText) {
+    if (!rawLinkText) return [];
+    return rawLinkText.split(';').map(s => s.trim()).filter(Boolean);
+}
+
+// Cada segmento da coluna L ("Plano Governo") normalmente vem como "N – rótulo curto" (o
+// número é a posição do item na aba "Plano Governo", 1 a 13). Extrai esse número; se não achar
+// (alguns segmentos têm o texto completo colado em vez do rótulo numerado), cai para casar o
+// texto contra o item correspondente em PG_PROPOSTAS.
+function extractPlanoGovernoNumeroDoSegmento(segmento) {
+    const m = segmento.match(/^(\d{1,2})\s*[–—\-−]/);
     if (m) {
         const n = parseInt(m[1], 10);
         if (PG_PROPOSTAS.some(item => item.numero === n)) return n;
     }
-    const norm = normalizeString(semNumero.replace(/;\s*$/, ''));
+    const norm = normalizeString(segmento);
     const found = PG_PROPOSTAS.find(item => {
         const itemNorm = normalizeString(item.texto);
         return norm === itemNorm || norm.includes(itemNorm) || itemNorm.includes(norm);
@@ -41,17 +48,27 @@ function extractPlanoGovernoNumero(linkText) {
     return found ? found.numero : null;
 }
 
-function matchPlanoGovernoProjects(numero) {
-    return planejamentoProjectPool().filter(p => extractPlanoGovernoNumero(p.planoGovernoLink) === numero);
+// Todos os itens do Plano Governo a que um projeto está vinculado (pode ser mais de um).
+function extractPlanoGovernoNumeros(linkText) {
+    return splitLinkSegments(linkText)
+        .map(extractPlanoGovernoNumeroDoSegmento)
+        .filter(n => n !== null);
 }
 
-// A coluna M ("Planej. Estratégico") vem como "Ação - Meta" (texto livre, às vezes com tab
-// solto no início). Compara normalizado contra o `linkText` de cada meta em PE_METAS.
+function matchPlanoGovernoProjects(numero) {
+    return planejamentoProjectPool().filter(p => extractPlanoGovernoNumeros(p.planoGovernoLink).includes(numero));
+}
+
+// Cada segmento da coluna M ("Planej. Estratégico") vem como "Ação - Meta" (texto livre, às
+// vezes com tab solto no início). Compara normalizado contra o `linkText` de cada meta em
+// PE_METAS — em qualquer um dos segmentos, não só no primeiro.
 function isPlanejEstrategicoMatch(linkText, metaLinkText) {
     if (!linkText || !metaLinkText) return false;
-    const a = normalizeString(linkText);
     const b = normalizeString(metaLinkText);
-    return a === b || a.includes(b) || b.includes(a);
+    return splitLinkSegments(linkText).some(segmento => {
+        const a = normalizeString(segmento);
+        return a === b || a.includes(b) || b.includes(a);
+    });
 }
 
 function matchPlanejEstrategicoProjects(metaLinkText) {

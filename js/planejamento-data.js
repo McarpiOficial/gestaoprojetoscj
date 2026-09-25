@@ -25,7 +25,7 @@ const PE_METAS = [
         id: 'pe2', tema: 'Sustentabilidade', objetivo: 'Assegurar a sustentabilidade financeira',
         acao: 'Implantar Aplicativo Jund.AI',
         meta: 'Pelo menos 3 serviços de IA na plataforma até o Q3', ano: 2026,
-        linkText: null
+        linkText: 'Implantar Aplicativo Jund.AI - Pelo menos 3 serviços de IA na plataforma até o Q3'
     },
     {
         id: 'pe3', tema: 'Sustentabilidade', objetivo: 'Assegurar a sustentabilidade financeira',
