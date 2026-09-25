@@ -149,7 +149,7 @@ function renderPlanejamentoEstrategico() {
         groups[c.status].push(planItemHtml({
             badgeText, badgeClass,
             titleHtml: `${escapeHtml(c.meta.acao)}: ${escapeHtml(c.meta.meta)}`,
-            subHtml: `${escapeHtml(c.meta.tema)} — ${escapeHtml(c.meta.objetivo)}`,
+            subHtml: 'Planej. Estratégico — aba "Planej. Estrategico"',
             matched: c.matched
         }));
     });
