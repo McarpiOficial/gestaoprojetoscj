@@ -22,12 +22,14 @@ function classifyPlanejamentoStatus(matched) {
 }
 
 // Um projeto pode estar vinculado a mais de um item ao mesmo tempo (interseção entre metas/
-// propostas) — nesse caso a célula tem vários valores separados por ";". Quebra em segmentos
-// individuais, descartando vazios (inclusive o "resto" depois de um ";" solto no fim do texto,
-// que é só pontuação da frase, não um segundo item).
+// propostas) — nesse caso a célula tem vários valores separados por ";" (padrão) ou, às vezes,
+// por "," antes de um novo item numerado da coluna L (ex.: "2 – Item A, 8 - Item B") — por isso
+// a vírgula só quebra quando é seguida de "Nº –", nunca no meio do texto normal de um item.
+// Descarta vazios, inclusive o "resto" depois de um ";" solto no fim do texto (pontuação da
+// frase, não um segundo item).
 function splitLinkSegments(rawLinkText) {
     if (!rawLinkText) return [];
-    return rawLinkText.split(';').map(s => s.trim()).filter(Boolean);
+    return rawLinkText.split(/\s*;\s*|\s*,\s*(?=\d{1,2}\s*[–—\-−])/).map(s => s.trim()).filter(Boolean);
 }
 
 // Cada segmento da coluna L ("Plano Governo") normalmente vem como "N – rótulo curto" (o
