@@ -98,9 +98,21 @@ function togglePlanGroup(headerEl) {
     if (group) group.classList.toggle('expanded');
 }
 
-function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched }) {
+// "DT" = aba "Projetos Recebidos" (viewCategory ativos/parados/backlog); "CIINTEC" = aba
+// CIINTEC. Só usado no grupo Em Andamento (showOrigin) — Atendido/Faltante não pedem essa marca.
+function projectOriginLabel(p) {
+    if (p.viewCategory === 'ciintec') return 'CIINTEC';
+    if (['ativos', 'parados', 'backlog'].includes(p.viewCategory)) return 'DT';
+    return null;
+}
+
+function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, showOrigin }) {
     const chips = matched.length
-        ? `<div class="plan-item-projects">${matched.map(p => `<span class="plan-project-chip" onclick="openProjectModal(${p.id})" title="${escapeHtml(p.secretaria)} — clique para abrir">${escapeHtml(p.ticket)} <small>(${escapeHtml(p.status)})</small></span>`).join('')}</div>`
+        ? `<div class="plan-item-projects">${matched.map(p => {
+            const origin = showOrigin ? projectOriginLabel(p) : null;
+            const originPrefix = origin ? `(${origin}) ` : '';
+            return `<span class="plan-project-chip" onclick="openProjectModal(${p.id})" title="${escapeHtml(p.secretaria)} — clique para abrir">${originPrefix}${escapeHtml(p.ticket)} <small>(${escapeHtml(p.status)})</small></span>`;
+        }).join('')}</div>`
         : '';
     return `<div class="plan-item">
         <div class="plan-item-header">
@@ -157,7 +169,8 @@ function renderPlanejamentoEstrategico() {
             badgeText, badgeClass,
             titleHtml: `${escapeHtml(c.meta.acao)}: ${escapeHtml(c.meta.meta)}`,
             subHtml: 'Planej. Estratégico — aba "Planej. Estrategico"',
-            matched: c.matched
+            matched: c.matched,
+            showOrigin: c.status === 'andamento'
         }));
     });
 
@@ -206,7 +219,8 @@ function renderPlanoGoverno() {
             badgeText: `Item ${c.prop.numero}`, badgeClass: '',
             titleHtml: escapeHtml(c.prop.texto),
             subHtml: 'Plano de Governo 2025-2028 — Eixo Tecnologia',
-            matched: c.matched
+            matched: c.matched,
+            showOrigin: c.status === 'andamento'
         }));
     });
 
