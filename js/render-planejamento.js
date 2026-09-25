@@ -21,18 +21,6 @@ function classifyPlanejamentoStatus(matched) {
     return 'faltante';
 }
 
-// Diferente de classifyPlanejamentoStatus (usado nos %/gráfico, onde 1 projeto encerrado já
-// basta para contar o item como atendido): aqui, um item só sai da lista "Em Andamento" quando
-// TODOS os projetos vinculados já encerraram. Um item com projetos misturados (1 encerrado + 1
-// ainda em andamento) continua em Em Andamento — mas com um contador vermelho (ver
-// planItemHtml/closedCount) avisando que já tem projeto encerrado atendendo, mesmo sem estar
-// 100% concluído.
-function classifyPlanejamentoDisplayStatus(matched) {
-    if (matched.length === 0) return 'faltante';
-    if (matched.every(isProjectAtendido)) return 'atendido';
-    return 'andamento';
-}
-
 // Um projeto pode estar vinculado a mais de um item ao mesmo tempo (interseção entre metas/
 // propostas) — nesse caso a célula tem vários valores separados por ";". Quebra em segmentos
 // individuais, descartando vazios (inclusive o "resto" depois de um ";" solto no fim do texto,
@@ -118,7 +106,7 @@ function projectOriginLabel(p) {
     return null;
 }
 
-function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, showOrigin, closedCount = 0 }) {
+function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, showOrigin }) {
     const chips = matched.length
         ? `<div class="plan-item-projects">${matched.map(p => {
             const origin = showOrigin ? projectOriginLabel(p) : null;
@@ -126,15 +114,9 @@ function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, show
             return `<span class="plan-project-chip" onclick="openProjectModal(${p.id})" title="${escapeHtml(p.secretaria)} — clique para abrir">${originPrefix}${escapeHtml(p.ticket)} <small>(${escapeHtml(p.status)})</small></span>`;
         }).join('')}</div>`
         : '';
-    // Só aparece em itens de "Em Andamento" que já têm pelo menos 1 projeto encerrado vinculado
-    // (junto de outro(s) ainda em andamento) — avisa que o item já está atendido por esse
-    // encerrado, mesmo continuando aqui por causa do(s) projeto(s) que falta(m) fechar.
-    const closedBadge = closedCount > 0
-        ? ` <span class="plan-item-closed-badge" title="${closedCount} projeto${closedCount > 1 ? 's' : ''} encerrado${closedCount > 1 ? 's' : ''} já vinculado${closedCount > 1 ? 's' : ''} a este item — ou seja, já está atendido por ele(s), mesmo aparecendo aqui por ainda ter outro(s) projeto(s) em andamento para o mesmo item.">(${closedCount})</span>`
-        : '';
     return `<div class="plan-item">
         <div class="plan-item-header">
-            <span class="plan-item-title">${titleHtml}${closedBadge}</span>
+            <span class="plan-item-title">${titleHtml}</span>
             <span class="plan-year-badge ${badgeClass}">${badgeText}</span>
         </div>
         <div class="plan-item-sub">${subHtml}</div>
@@ -147,9 +129,8 @@ function renderPlanejamentoEstrategico() {
     const computed = PE_METAS.map(meta => {
         const matched = matchPlanejEstrategicoProjects(meta);
         const status = classifyPlanejamentoStatus(matched);
-        const displayStatus = classifyPlanejamentoDisplayStatus(matched);
         const futuro = status === 'faltante' && meta.ano > anoAtual;
-        return { meta, matched, status, displayStatus, futuro };
+        return { meta, matched, status, futuro };
     });
 
     const total = computed.length || 1;
@@ -184,14 +165,12 @@ function renderPlanejamentoEstrategico() {
     computed.forEach(c => {
         const badgeText = c.status === 'faltante' && c.futuro ? `${c.meta.ano} · Futuro` : `${c.meta.ano}`;
         const badgeClass = c.status === 'faltante' && c.futuro ? 'futuro' : '';
-        const closedCount = c.displayStatus === 'andamento' ? c.matched.filter(isProjectAtendido).length : 0;
-        groups[c.displayStatus].push(planItemHtml({
+        groups[c.status].push(planItemHtml({
             badgeText, badgeClass,
             titleHtml: `${escapeHtml(c.meta.acao)}: ${escapeHtml(c.meta.meta)}`,
             subHtml: 'Planej. Estratégico — aba "Planej. Estrategico"',
             matched: c.matched,
-            showOrigin: c.displayStatus === 'andamento',
-            closedCount
+            showOrigin: c.status === 'andamento'
         }));
     });
 
@@ -199,17 +178,16 @@ function renderPlanejamentoEstrategico() {
     document.getElementById('pe-list-andamento').innerHTML = groups.andamento.join('') || '<p class="plan-list-empty">Nenhuma meta em andamento.</p>';
     document.getElementById('pe-list-faltante').innerHTML = groups.faltante.join('') || '<p class="plan-list-empty">Nenhuma meta faltante.</p>';
 
-    document.getElementById('pe-count-atendido').textContent = `(${groups.atendido.length})`;
-    document.getElementById('pe-count-andamento').textContent = `(${groups.andamento.length})`;
-    document.getElementById('pe-count-faltante').textContent = `(${groups.faltante.length})`;
+    document.getElementById('pe-count-atendido').textContent = `(${atendido})`;
+    document.getElementById('pe-count-andamento').textContent = `(${andamento})`;
+    document.getElementById('pe-count-faltante').textContent = `(${faltanteTotal})`;
 }
 
 function renderPlanoGoverno() {
     const computed = PG_PROPOSTAS.map(prop => {
         const matched = matchPlanoGovernoProjects(prop.numero);
         const status = classifyPlanejamentoStatus(matched);
-        const displayStatus = classifyPlanejamentoDisplayStatus(matched);
-        return { prop, matched, status, displayStatus };
+        return { prop, matched, status };
     });
 
     const total = computed.length || 1;
@@ -237,14 +215,12 @@ function renderPlanoGoverno() {
 
     const groups = { atendido: [], andamento: [], faltante: [] };
     computed.forEach(c => {
-        const closedCount = c.displayStatus === 'andamento' ? c.matched.filter(isProjectAtendido).length : 0;
-        groups[c.displayStatus].push(planItemHtml({
+        groups[c.status].push(planItemHtml({
             badgeText: `Item ${c.prop.numero}`, badgeClass: '',
             titleHtml: escapeHtml(c.prop.texto),
             subHtml: 'Plano de Governo 2025-2028 — Eixo Tecnologia',
             matched: c.matched,
-            showOrigin: c.displayStatus === 'andamento',
-            closedCount
+            showOrigin: c.status === 'andamento'
         }));
     });
 
@@ -252,7 +228,7 @@ function renderPlanoGoverno() {
     document.getElementById('pg-list-andamento').innerHTML = groups.andamento.join('') || '<p class="plan-list-empty">Nenhuma proposta em andamento.</p>';
     document.getElementById('pg-list-faltante').innerHTML = groups.faltante.join('') || '<p class="plan-list-empty">Nenhuma proposta faltante.</p>';
 
-    document.getElementById('pg-count-atendido').textContent = `(${groups.atendido.length})`;
-    document.getElementById('pg-count-andamento').textContent = `(${groups.andamento.length})`;
-    document.getElementById('pg-count-faltante').textContent = `(${groups.faltante.length})`;
+    document.getElementById('pg-count-atendido').textContent = `(${atendido})`;
+    document.getElementById('pg-count-andamento').textContent = `(${andamento})`;
+    document.getElementById('pg-count-faltante').textContent = `(${faltante})`;
 }
