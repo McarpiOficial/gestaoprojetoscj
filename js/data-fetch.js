@@ -78,7 +78,11 @@ function fetchSpreadsheetData() {
     const script = document.createElement('script');
     script.id = 'google-sheets-jsonp';
     script.onerror = showFetchError;
-    script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=responseHandler:handleSheetsResponse`;
+    // nocache: sem isso, clicar em "Atualizar Dados" repetidas vezes reenviava exatamente a
+    // mesma URL e o navegador podia responder com uma cópia em cache em vez de buscar de novo
+    // — era a única requisição da cadeia sem esse parâmetro (as outras abaixo já tinham).
+    const antiCachePrincipal = new Date().getTime();
+    script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?nocache=${antiCachePrincipal}&tqx=responseHandler:handleSheetsResponse`;
     document.body.appendChild(script);
 
     // Independente da cadeia principal acima: se a aba da Prefeitura ou a planilha de

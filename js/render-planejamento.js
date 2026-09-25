@@ -59,9 +59,17 @@ function matchPlanoGovernoProjects(numero) {
     return planejamentoProjectPool().filter(p => extractPlanoGovernoNumeros(p.planoGovernoLink).includes(numero));
 }
 
+// O texto que a coluna M usa para vincular um projeto a uma meta é sempre "Ação - Meta" —
+// calculado aqui, nunca guardado em planejamento-data.js (guardar um texto de busca fixo por
+// meta já causou bug: uma meta sem projeto vinculado no momento em que os dados foram escritos
+// ficava travada em Faltante para sempre, mesmo depois de alguém vincular um projeto a ela).
+function peMetaLinkText(meta) {
+    return `${meta.acao} - ${meta.meta}`;
+}
+
 // Cada segmento da coluna M ("Planej. Estratégico") vem como "Ação - Meta" (texto livre, às
-// vezes com tab solto no início). Compara normalizado contra o `linkText` de cada meta em
-// PE_METAS — em qualquer um dos segmentos, não só no primeiro.
+// vezes com tab solto no início). Compara normalizado contra o texto da meta — em qualquer um
+// dos segmentos, não só no primeiro.
 function isPlanejEstrategicoMatch(linkText, metaLinkText) {
     if (!linkText || !metaLinkText) return false;
     const b = normalizeString(metaLinkText);
@@ -71,9 +79,8 @@ function isPlanejEstrategicoMatch(linkText, metaLinkText) {
     });
 }
 
-function matchPlanejEstrategicoProjects(metaLinkText) {
-    if (!metaLinkText) return [];
-    return planejamentoProjectPool().filter(p => isPlanejEstrategicoMatch(p.planejEstrategicoLink, metaLinkText));
+function matchPlanejEstrategicoProjects(meta) {
+    return planejamentoProjectPool().filter(p => isPlanejEstrategicoMatch(p.planejEstrategicoLink, peMetaLinkText(meta)));
 }
 
 function renderPlanejamento() {
@@ -108,7 +115,7 @@ function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched }) {
 function renderPlanejamentoEstrategico() {
     const anoAtual = PLANEJAMENTO_ANO_ATUAL;
     const computed = PE_METAS.map(meta => {
-        const matched = matchPlanejEstrategicoProjects(meta.linkText);
+        const matched = matchPlanejEstrategicoProjects(meta);
         const status = classifyPlanejamentoStatus(matched);
         const futuro = status === 'faltante' && meta.ano > anoAtual;
         return { meta, matched, status, futuro };

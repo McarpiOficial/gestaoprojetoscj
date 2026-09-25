@@ -11,59 +11,54 @@ const PLANEJAMENTO_ANO_ATUAL = new Date().getFullYear();
 
 // ---------------------------------------------------------------------------------------
 // Planej. Estrategico da CIJUN — aba "Planej. Estrategico" da planilha, na mesma ordem das
-// linhas. `linkText` é "Ação - Meta" (o formato exato que a coluna M dos projetos usa para se
-// vincular a cada meta); `ano` vem literalmente da coluna C dessa aba.
+// linhas (A=acao, B=meta, C=ano). O texto que a coluna M dos projetos usa para se vincular a
+// uma meta é sempre "Ação - Meta" (sem exceção observada até hoje) — por isso NÃO guardamos um
+// `linkText` manual por item aqui (isso já causou um bug: uma meta sem nenhum projeto vinculado
+// no momento em que este arquivo foi escrito ficava com `linkText: null` fixo, e continuava
+// travada em Faltante mesmo depois de alguém vincular um projeto a ela na planilha). O texto de
+// busca é sempre calculado a partir de acao+meta em tempo real — ver peMetaLinkText() em
+// js/render-planejamento.js.
 // ---------------------------------------------------------------------------------------
 const PE_METAS = [
     {
         id: 'pe1', acao: 'Implantar Aplicativo Jund.AI',
-        meta: 'Permitir realizar login também pelo Gov.Br', ano: 2025,
-        linkText: null
+        meta: 'Permitir realizar login também pelo Gov.Br', ano: 2025
     },
     {
         id: 'pe2', acao: 'Implantar Aplicativo Jund.AI',
-        meta: 'Pelo menos 3 serviços de IA na plataforma até o Q3', ano: 2026,
-        linkText: 'Implantar Aplicativo Jund.AI - Pelo menos 3 serviços de IA na plataforma até o Q3'
+        meta: 'Pelo menos 3 serviços de IA na plataforma até o Q3', ano: 2026
     },
     {
         id: 'pe3', acao: 'Implantar Aplicativo Jund.AI',
-        meta: 'Obter índice máximo de 30% de ausência de respostas para perguntas dos usuários no chatbot', ano: 2027,
-        linkText: 'Implantar Aplicativo Jund.AI - Obter índice máximo de 30% de ausência de respostas para perguntas dos usuários no chatbot'
+        meta: 'Obter índice máximo de 30% de ausência de respostas para perguntas dos usuários no chatbot', ano: 2027
     },
     {
         id: 'pe4', acao: 'Implementar Soluções de Interação Cidadã com IA (Chatbots e Assistentes Virtuais)',
-        meta: 'Desenvolver e testar pelo menos 1 Prova de Conceito (PoC) de integração da plataforma com dispositivos IoT ou assistentes de voz', ano: 2028,
-        linkText: null
+        meta: 'Desenvolver e testar pelo menos 1 Prova de Conceito (PoC) de integração da plataforma com dispositivos IoT ou assistentes de voz', ano: 2028
     },
     {
         id: 'pe5', acao: 'Desenvolver plataforma integrada - JundIA (aplicativo mobile e portal web unificados).',
-        meta: '3 serviços municipais críticos integrados e funcionando na plataforma', ano: 2025,
-        linkText: 'Desenvolver plataforma integrada - JundIA (aplicativo mobile e portal web unificados). - 3 serviços municipais críticos integrados e funcionando na plataforma'
+        meta: '3 serviços municipais críticos integrados e funcionando na plataforma', ano: 2025
     },
     {
         id: 'pe6', acao: 'Implementar Soluções de Interação Cidadã com IA (Chatbots e Assistentes Virtuais)',
-        meta: 'Aprovar arquitetura até o meio de 2026. MVP implantado e integrado com as fontes de dados de pelos menos 2 secretarias piloto', ano: 2026,
-        linkText: 'Implementar Soluções de Interação Cidadã com IA (Chatbots e Assistentes Virtuais) - Aprovar arquitetura até o meio de 2026. MVP implantado e integrado com as fontes de dados de pelos menos 2 secretarias piloto'
+        meta: 'Aprovar arquitetura até o meio de 2026. MVP implantado e integrado com as fontes de dados de pelos menos 2 secretarias piloto', ano: 2026
     },
     {
         id: 'pe7', acao: 'Implementar Soluções de Interação Cidadã com IA (Chatbots e Assistentes Virtuais)',
-        meta: 'Ferramenta BI self service implantada e com pelo menos 10 usuários', ano: 2027,
-        linkText: 'Implementar Soluções de Interação Cidadã com IA (Chatbots e Assistentes Virtuais) - Ferramenta BI self service implantada e com pelo menos 10 usuários'
+        meta: 'Ferramenta BI self service implantada e com pelo menos 10 usuários', ano: 2027
     },
     {
         id: 'pe8', acao: 'Automatizar processos internos das secretarias e aumentar a produtividade dos servidores',
-        meta: '2 processos automatizados com RPA em uma secretaria piloto até o final', ano: 2025,
-        linkText: 'Automatizar processos internos das secretarias e aumentar a produtividade dos servidores - 2 processos automatizados com RPA em uma secretaria piloto até o final'
+        meta: '2 processos automatizados com RPA em uma secretaria piloto até o final', ano: 2025
     },
     {
         id: 'pe9', acao: 'Desenvolver e Implantar tecnologias de cidades inteligentes para mobilidade, segurança, meio ambiente, etc.',
-        meta: 'pelo menos 1 Prova de Conceito (PoC) de integração da plataforma com dispositivos IoT ou assistentes de voz', ano: 2028,
-        linkText: 'Desenvolver e Implantar tecnologias de cidades inteligentes para mobilidade, segurança, meio ambiente, etc. - pelo menos 1 Prova de Conceito (PoC) de integração da plataforma com dispositivos IoT ou assistentes de voz'
+        meta: 'pelo menos 1 Prova de Conceito (PoC) de integração da plataforma com dispositivos IoT ou assistentes de voz', ano: 2028
     },
     {
         id: 'pe10', acao: 'Estruturar eventos de Hackathons',
-        meta: 'Ter realizado um evento', ano: 2026,
-        linkText: 'Estruturar eventos de Hackathons - Ter realizado um evento'
+        meta: 'Ter realizado um evento', ano: 2026
     }
 ];
 
