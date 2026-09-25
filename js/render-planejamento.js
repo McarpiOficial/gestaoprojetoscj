@@ -21,6 +21,17 @@ function classifyPlanejamentoStatus(matched) {
     return 'faltante';
 }
 
+// Só usado no Plano Governo, e só pra decidir em qual lista o item aparece (Atendido/Em
+// Andamento/Faltante) — os %/KPI/gráfico continuam usando classifyPlanejamentoStatus acima sem
+// mudança nenhuma. Diferença: aqui um item só vira Atendido quando TODOS os projetos vinculados
+// já finalizaram; se sobrar pelo menos 1 rodando, o item continua em Em Andamento (com o aviso
+// vermelho de quantos dos vinculados já finalizaram, ver planItemHtml/closedCount).
+function classifyPlanoGovernoDisplayStatus(matched) {
+    if (matched.length === 0) return 'faltante';
+    if (matched.every(isProjectAtendido)) return 'atendido';
+    return 'andamento';
+}
+
 // Um projeto pode estar vinculado a mais de um item ao mesmo tempo (interseção entre metas/
 // propostas) — nesse caso a célula tem vários valores separados por ";". Quebra em segmentos
 // individuais, descartando vazios (inclusive o "resto" depois de um ";" solto no fim do texto,
@@ -194,7 +205,8 @@ function renderPlanoGoverno() {
     const computed = PG_PROPOSTAS.map(prop => {
         const matched = matchPlanoGovernoProjects(prop.numero);
         const status = classifyPlanejamentoStatus(matched);
-        return { prop, matched, status };
+        const displayStatus = classifyPlanoGovernoDisplayStatus(matched);
+        return { prop, matched, status, displayStatus };
     });
 
     const total = computed.length || 1;
@@ -222,13 +234,14 @@ function renderPlanoGoverno() {
 
     const groups = { atendido: [], andamento: [], faltante: [] };
     computed.forEach(c => {
-        groups[c.status].push(planItemHtml({
+        const closedCount = c.displayStatus === 'andamento' ? c.matched.filter(isProjectAtendido).length : 0;
+        groups[c.displayStatus].push(planItemHtml({
             badgeText: `Item ${c.prop.numero}`, badgeClass: '',
             titleHtml: escapeHtml(c.prop.texto),
             subHtml: 'Plano de Governo 2025-2028 — Eixo Tecnologia',
             matched: c.matched,
-            showOrigin: c.status === 'andamento',
-            closedCount: c.status === 'andamento' ? c.matched.filter(isProjectAtendido).length : 0
+            showOrigin: c.displayStatus === 'andamento',
+            closedCount
         }));
     });
 
@@ -236,7 +249,7 @@ function renderPlanoGoverno() {
     document.getElementById('pg-list-andamento').innerHTML = groups.andamento.join('') || '<p class="plan-list-empty">Nenhuma proposta em andamento.</p>';
     document.getElementById('pg-list-faltante').innerHTML = groups.faltante.join('') || '<p class="plan-list-empty">Nenhuma proposta faltante.</p>';
 
-    document.getElementById('pg-count-atendido').textContent = `(${atendido})`;
-    document.getElementById('pg-count-andamento').textContent = `(${andamento})`;
-    document.getElementById('pg-count-faltante').textContent = `(${faltante})`;
+    document.getElementById('pg-count-atendido').textContent = `(${groups.atendido.length})`;
+    document.getElementById('pg-count-andamento').textContent = `(${groups.andamento.length})`;
+    document.getElementById('pg-count-faltante').textContent = `(${groups.faltante.length})`;
 }
