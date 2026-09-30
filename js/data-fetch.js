@@ -85,11 +85,12 @@ function fetchSpreadsheetData() {
     script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?nocache=${antiCachePrincipal}&tqx=responseHandler:handleSheetsResponse`;
     document.body.appendChild(script);
 
-    // Independente da cadeia principal acima: se a aba da Prefeitura ou a planilha de
-    // Contratos falharem, só os respectivos quadros ficam indisponíveis (ver
+    // Independente da cadeia principal acima: se a aba da Prefeitura, a planilha de Contratos
+    // ou a aba Proposta Comercial falharem, só os respectivos quadros ficam indisponíveis (ver
     // js/render-prefeitura.js e js/render-contratos.js).
     fetchPrefeituraBoard();
     fetchContratosData();
+    fetchPropostaComercialData();
 }
 
 function isNotStopped(p) {

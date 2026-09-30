@@ -494,3 +494,48 @@ function renderContratosIndicadores() {
     populateContratosAcumuladoMesSelect();
     renderContratosAcumuladoMesChart();
 }
+
+// --- Card "Proposta Aprovadas (ano)" ----------------------------------------------------
+// Lê a aba "Proposta Comercial" da MESMA planilha de projetos (SPREADSHEET_ID, não a de
+// Contratos) e soma a coluna "Valor Venda" (coluna N) — cada linha aprovada recebe esse valor
+// só quando a proposta comercial é fechada, então a soma já reflete naturalmente as aprovadas
+// (linhas ainda em negociação ficam com a célula vazia, contribuindo 0). Busca independente:
+// se falhar, só esse card fica indisponível.
+
+function showPropostaComercialError() {
+    const el = document.getElementById('contratos-propostas-aprovadas');
+    if (el) el.innerText = '—';
+}
+
+function fetchPropostaComercialData() {
+    const oldScript = document.getElementById('proposta-comercial-jsonp');
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement('script');
+    script.id = 'proposta-comercial-jsonp';
+    script.onerror = showPropostaComercialError;
+    const antiCache = new Date().getTime();
+    script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent('Proposta Comercial')}&tq=select *&nocache=${antiCache}&tqx=responseHandler:handlePropostaComercialResponse`;
+    document.body.appendChild(script);
+}
+
+function handlePropostaComercialResponse(response) {
+    const el = document.getElementById('contratos-propostas-aprovadas');
+    if (!el) return;
+    if (!response || !response.table) { showPropostaComercialError(); return; }
+
+    const cols = response.table.cols.map(c => normalizeString(c ? c.label : ''));
+    const idxValor = (() => {
+        const idx = cols.findIndex(c => c === normalizeString('Valor Venda') || c.includes(normalizeString('Valor Venda')));
+        return idx !== -1 ? idx : 13; // fallback posicional: coluna N
+    })();
+
+    const total = response.table.rows.reduce((acc, row) => {
+        if (!row || !row.c) return acc;
+        const cell = row.c[idxValor];
+        const raw = cell ? (cell.f !== undefined && cell.f !== null ? cell.f : cell.v) : '';
+        return acc + parseBrazilianCurrency(raw);
+    }, 0);
+
+    el.innerText = formatCurrencyBRL(total);
+}
