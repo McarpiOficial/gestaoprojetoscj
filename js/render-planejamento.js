@@ -21,17 +21,6 @@ function classifyPlanejamentoStatus(matched) {
     return 'faltante';
 }
 
-// Só usado no Plano Governo, e só pra decidir em qual lista o item aparece (Atendido/Em
-// Andamento/Faltante) — os %/KPI/gráfico continuam usando classifyPlanejamentoStatus acima sem
-// mudança nenhuma. Diferença: aqui um item só vira Atendido quando TODOS os projetos vinculados
-// já finalizaram; se sobrar pelo menos 1 rodando, o item continua em Em Andamento (com o aviso
-// vermelho de quantos dos vinculados já finalizaram, ver planItemHtml/closedCount).
-function classifyPlanoGovernoDisplayStatus(matched) {
-    if (matched.length === 0) return 'faltante';
-    if (matched.every(isProjectAtendido)) return 'atendido';
-    return 'andamento';
-}
-
 // Um projeto pode estar vinculado a mais de um item ao mesmo tempo (interseção entre metas/
 // propostas) — nesse caso a célula tem vários valores separados por ";". Quebra em segmentos
 // individuais, descartando vazios (inclusive o "resto" depois de um ";" solto no fim do texto,
@@ -125,7 +114,7 @@ function projectOriginLabel(p) {
     return null;
 }
 
-function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, showOrigin, closedCount = 0 }) {
+function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, showOrigin }) {
     const chips = matched.length
         ? `<div class="plan-item-projects">${matched.map(p => {
             const origin = showOrigin ? projectOriginLabel(p) : null;
@@ -133,16 +122,9 @@ function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, show
             return `<span class="plan-project-chip" onclick="openProjectModal(${p.id})" title="${escapeHtml(p.secretaria)} — clique para abrir">${originPrefix}${escapeHtml(p.ticket)} <small>(${escapeHtml(p.status)})</small></span>`;
         }).join('')}</div>`
         : '';
-    // Só passado (>0) em itens do grupo Em Andamento — não muda a classificação/percentuais,
-    // é só um aviso visual de que, pela regra atual, isso não deveria acontecer (qualquer
-    // projeto já finalizado joga o item inteiro pro grupo Atendido). Serve pra confirmar de
-    // relance que os itens aqui são mesmo só de projetos em andamento.
-    const closedBadge = closedCount > 0
-        ? ` <span class="plan-item-closed-badge" title="${closedCount} projeto${closedCount > 1 ? 's' : ''} já finalizado${closedCount > 1 ? 's' : ''} vinculado${closedCount > 1 ? 's' : ''} a este item.">(${closedCount})</span>`
-        : '';
     return `<div class="plan-item">
         <div class="plan-item-header">
-            <span class="plan-item-title">${titleHtml}${closedBadge}</span>
+            <span class="plan-item-title">${titleHtml}</span>
             <span class="plan-year-badge ${badgeClass}">${badgeText}</span>
         </div>
         <div class="plan-item-sub">${subHtml}</div>
@@ -213,8 +195,7 @@ function renderPlanoGoverno() {
     const computed = PG_PROPOSTAS.map(prop => {
         const matched = matchPlanoGovernoProjects(prop.numero);
         const status = classifyPlanejamentoStatus(matched);
-        const displayStatus = classifyPlanoGovernoDisplayStatus(matched);
-        return { prop, matched, status, displayStatus };
+        return { prop, matched, status };
     });
 
     const total = computed.length || 1;
@@ -242,14 +223,12 @@ function renderPlanoGoverno() {
 
     const groups = { atendido: [], andamento: [], faltante: [] };
     computed.forEach(c => {
-        const closedCount = c.displayStatus === 'andamento' ? c.matched.filter(isProjectAtendido).length : 0;
-        groups[c.displayStatus].push(planItemHtml({
+        groups[c.status].push(planItemHtml({
             badgeText: `Item ${c.prop.numero}`, badgeClass: '',
             titleHtml: escapeHtml(c.prop.texto),
             subHtml: 'Plano de Governo 2025-2028 — Eixo Tecnologia',
             matched: c.matched,
-            showOrigin: c.displayStatus === 'andamento',
-            closedCount
+            showOrigin: c.status === 'andamento'
         }));
     });
 
@@ -257,7 +236,7 @@ function renderPlanoGoverno() {
     document.getElementById('pg-list-andamento').innerHTML = groups.andamento.join('') || '<p class="plan-list-empty">Nenhuma proposta em andamento.</p>';
     document.getElementById('pg-list-faltante').innerHTML = groups.faltante.join('') || '<p class="plan-list-empty">Nenhuma proposta faltante.</p>';
 
-    document.getElementById('pg-count-atendido').textContent = `(${groups.atendido.length})`;
-    document.getElementById('pg-count-andamento').textContent = `(${groups.andamento.length})`;
-    document.getElementById('pg-count-faltante').textContent = `(${groups.faltante.length})`;
+    document.getElementById('pg-count-atendido').textContent = `(${atendido})`;
+    document.getElementById('pg-count-andamento').textContent = `(${andamento})`;
+    document.getElementById('pg-count-faltante').textContent = `(${faltante})`;
 }
