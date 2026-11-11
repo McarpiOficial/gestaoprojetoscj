@@ -35,10 +35,12 @@ function classifyPlanoGovernoDisplayStatus(matched) {
 // Um projeto pode estar vinculado a mais de um item ao mesmo tempo (interseção entre metas/
 // propostas) — nesse caso a célula tem vários valores separados por ";". Quebra em segmentos
 // individuais, descartando vazios (inclusive o "resto" depois de um ";" solto no fim do texto,
-// que é só pontuação da frase, não um segundo item).
+// que é só pontuação da frase, não um segundo item). Também descarta segmentos sem nenhuma
+// letra/número (ex.: "-", que a planilha usa para "sem vínculo"): sem isso, o "-" casava com
+// toda meta do Planej. Estratégico, já que o texto "Ação - Meta" sempre contém um hífen.
 function splitLinkSegments(rawLinkText) {
     if (!rawLinkText) return [];
-    return rawLinkText.split(';').map(s => s.trim()).filter(Boolean);
+    return rawLinkText.split(';').map(s => s.trim()).filter(s => /[\p{L}\p{N}]/u.test(s));
 }
 
 // Cada segmento da coluna L ("Plano Governo") normalmente vem como "N – rótulo curto" (o
