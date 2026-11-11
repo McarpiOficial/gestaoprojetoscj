@@ -68,8 +68,14 @@ function extractPlanoGovernoNumeros(linkText) {
         .filter(n => n !== null);
 }
 
+// Projetos com Status SUSPENSO são ignorados no Plano Governo (não contam como vinculados, nem
+// aparecem como etiqueta). Só vale aqui — o Planej. Estratégico continua considerando todos.
+function isProjectSuspenso(p) {
+    return !!p.status && normalizeString(p.status) === 'suspenso';
+}
+
 function matchPlanoGovernoProjects(numero) {
-    return planejamentoProjectPool().filter(p => extractPlanoGovernoNumeros(p.planoGovernoLink).includes(numero));
+    return planejamentoProjectPool().filter(p => !isProjectSuspenso(p) && extractPlanoGovernoNumeros(p.planoGovernoLink).includes(numero));
 }
 
 // O texto que a coluna M usa para vincular um projeto a uma meta é sempre "Ação - Meta" —
