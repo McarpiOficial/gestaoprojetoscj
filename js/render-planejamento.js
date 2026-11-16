@@ -40,10 +40,10 @@ function extractPlanoGovernoNumeroDoSegmento(segmento) {
     const m = segmento.match(/^(\d{1,2})\s*[–—\-−]/);
     if (m) {
         const n = parseInt(m[1], 10);
-        if (PG_PROPOSTAS.some(item => item.numero === n)) return n;
+        if (getPgPropostas().some(item => item.numero === n)) return n;
     }
     const norm = normalizeString(segmento);
-    const found = PG_PROPOSTAS.find(item => {
+    const found = getPgPropostas().find(item => {
         const itemNorm = normalizeString(item.texto);
         return norm === itemNorm || norm.includes(itemNorm) || itemNorm.includes(norm);
     });
@@ -91,6 +91,73 @@ function matchPlanejEstrategicoProjects(meta) {
     return planejamentoProjectPool().filter(p => isPlanejEstrategicoMatch(p.planejEstrategicoLink, peMetaLinkText(meta)));
 }
 
+// Metas do Planej. Estratégico: lidas ao vivo da aba "Planej. Estrategico" (colunas A=Ação,
+// B=Meta, C=Ano) — qualquer meta nova na planilha aparece sozinha. PE_METAS (planejamento-data.js)
+// é só reserva, usada enquanto a leitura não chegou ou se ela falhar.
+function getPeMetas() {
+    return peMetasLive || PE_METAS;
+}
+
+function fetchPlanejEstrategicoMetas() {
+    const oldScript = document.getElementById('pe-metas-jsonp');
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement('script');
+    script.id = 'pe-metas-jsonp';
+    const antiCache = new Date().getTime();
+    script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent('Planej. Estrategico')}&headers=0&tq=select *&nocache=${antiCache}&tqx=responseHandler:handlePlanejEstrategicoMetasResponse`;
+    document.body.appendChild(script);
+}
+
+function handlePlanejEstrategicoMetasResponse(response) {
+    if (!response || !response.table) return;
+
+    const text = (cell) => (cell && cell.v !== undefined && cell.v !== null) ? cell.v.toString().trim() : '';
+    const metas = response.table.rows
+        .map(row => row && row.c ? { acao: text(row.c[0]), meta: text(row.c[1]), ano: parseInt(text(row.c[2]), 10) } : null)
+        .filter(m => m && m.acao && m.meta)
+        .map((m, i) => ({ id: `pe${i + 1}`, acao: m.acao, meta: m.meta, ano: isNaN(m.ano) ? null : m.ano }));
+
+    if (metas.length === 0) return;
+    peMetasLive = metas;
+    if (parsedProjectsList.length > 0) renderPlanejamento();
+}
+
+// Propostas do Plano Governo: lidas ao vivo da aba "Plano Governo" (A=texto, B=número que a
+// coluna L dos projetos usa); se a coluna B não for numérica, vale a posição da linha.
+// PG_PROPOSTAS (planejamento-data.js) é só reserva, como PE_METAS.
+function getPgPropostas() {
+    return pgPropostasLive || PG_PROPOSTAS;
+}
+
+function fetchPlanoGovernoPropostas() {
+    const oldScript = document.getElementById('pg-propostas-jsonp');
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement('script');
+    script.id = 'pg-propostas-jsonp';
+    const antiCache = new Date().getTime();
+    script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent('Plano Governo')}&headers=0&tq=select *&nocache=${antiCache}&tqx=responseHandler:handlePlanoGovernoPropostasResponse`;
+    document.body.appendChild(script);
+}
+
+function handlePlanoGovernoPropostasResponse(response) {
+    if (!response || !response.table) return;
+
+    const propostas = response.table.rows
+        .map((row, i) => {
+            if (!row || !row.c) return null;
+            const texto = (row.c[0] && row.c[0].v !== undefined && row.c[0].v !== null) ? row.c[0].v.toString().trim() : '';
+            const n = row.c[1] ? parseInt(row.c[1].v, 10) : NaN;
+            return { numero: isNaN(n) ? i + 1 : n, texto };
+        })
+        .filter(p => p && p.texto);
+
+    if (propostas.length === 0) return;
+    pgPropostasLive = propostas;
+    if (parsedProjectsList.length > 0) renderPlanejamento();
+}
+
 function renderPlanejamento() {
     if (typeof PE_METAS === 'undefined' || typeof PG_PROPOSTAS === 'undefined') return;
     if (!document.getElementById('pe-kpi-atendido')) return; // panes ainda não estão no DOM
@@ -134,7 +201,7 @@ function planItemHtml({ badgeText, badgeClass, titleHtml, subHtml, matched, show
 
 function renderPlanejamentoEstrategico() {
     const anoAtual = PLANEJAMENTO_ANO_ATUAL;
-    const computed = PE_METAS.map(meta => {
+    const computed = getPeMetas().map(meta => {
         const matched = matchPlanejEstrategicoProjects(meta);
         const status = classifyPlanejamentoStatus(matched);
         const futuro = status === 'faltante' && meta.ano > anoAtual;
@@ -171,7 +238,7 @@ function renderPlanejamentoEstrategico() {
 
     const groups = { atendido: [], andamento: [], faltante: [] };
     computed.forEach(c => {
-        const badgeText = c.status === 'faltante' && c.futuro ? `${c.meta.ano} · Futuro` : `${c.meta.ano}`;
+        const badgeText = c.status === 'faltante' && c.futuro ? `${c.meta.ano} · Futuro` : `${c.meta.ano ?? 'Sem ano'}`;
         const badgeClass = c.status === 'faltante' && c.futuro ? 'futuro' : '';
         groups[c.status].push(planItemHtml({
             badgeText, badgeClass,
@@ -192,7 +259,7 @@ function renderPlanejamentoEstrategico() {
 }
 
 function renderPlanoGoverno() {
-    const computed = PG_PROPOSTAS.map(prop => {
+    const computed = getPgPropostas().map(prop => {
         const matched = matchPlanoGovernoProjects(prop.numero);
         const status = classifyPlanejamentoStatus(matched);
         return { prop, matched, status };

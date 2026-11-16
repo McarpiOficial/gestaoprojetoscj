@@ -91,6 +91,8 @@ function fetchSpreadsheetData() {
     fetchPrefeituraBoard();
     fetchContratosData();
     fetchPropostaComercialData();
+    fetchPlanejEstrategicoMetas();
+    fetchPlanoGovernoPropostas();
 }
 
 function isNotStopped(p) {

@@ -1,6 +1,9 @@
 // Dados estáticos das telas "Planejamento" (menu lateral) — vêm só da planilha, não do PDF:
-// - PE_METAS é a aba "Planej. Estrategico" (colunas A=Ação, B=Meta, C=Ano), copiada verbatim.
-// - PG_PROPOSTAS é a aba "Plano Governo" (coluna A), copiada verbatim.
+// - PE_METAS é só uma cópia de reserva da aba "Planej. Estrategico" (A=Ação, B=Meta, C=Ano): o
+//   painel lê a aba ao vivo (ver getPeMetas em js/render-planejamento.js) e só usa esta cópia
+//   enquanto a leitura não chegou ou se ela falhar — não precisa atualizá-la a cada meta nova.
+// - PG_PROPOSTAS é só uma cópia de reserva da aba "Plano Governo" (coluna A), com a mesma regra
+//   de leitura ao vivo acima (ver getPgPropostas em js/render-planejamento.js).
 // O vínculo com os projetos NÃO é feito aqui, nem por nome de ticket: cada projeto na
 // planilha (abas "Projetos Recebidos", "CIINTEC" e "Finalizados") já tem colunas próprias de
 // vínculo — coluna L ("Plano Governo") e coluna M ("Planej. Estratégico") — carregadas em cada

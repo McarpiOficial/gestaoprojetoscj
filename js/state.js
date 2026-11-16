@@ -34,5 +34,7 @@ let chartContratosAcumuladoMesInstance = null;
 
 // Planejamento (Planej. Estratégico / Plano Governo) — comparação de PE_METAS/PG_PROPOSTAS
 // (js/planejamento-data.js) contra parsedProjectsList, feita em js/render-planejamento.js.
+let peMetasLive = null; // metas lidas ao vivo da aba "Planej. Estrategico"; null = ainda não carregou
+let pgPropostasLive = null; // propostas lidas ao vivo da aba "Plano Governo"; null = ainda não carregou
 let chartPlanEstrategicoInstance = null;
 let chartPlanoGovernoInstance = null;
